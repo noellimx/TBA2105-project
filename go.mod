@@ -2,16 +2,17 @@ module github.com/noellimx/TBA2105-project.git
 
 go 1.19
 
-require github.com/labstack/echo/v4 v4.9.0
+require (
+	github.com/dghubble/go-twitter v0.0.0-20220816163853-8a0df96f1e6d
+	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
+)
 
 require (
-	github.com/labstack/gommon v0.3.1 // indirect
-	github.com/mattn/go-colorable v0.1.11 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.1 // indirect
-	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
-	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
-	golang.org/x/sys v0.0.0-20211103235746-7861aae1554b // indirect
-	golang.org/x/text v0.3.7 // indirect
+	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
+	github.com/dghubble/sling v1.4.0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 )
