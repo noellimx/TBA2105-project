@@ -8,11 +8,11 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-type HelloService struct {
+type helloService struct {
 	c *twitter.Client
 }
 
-func (h *HelloService) helloFollowers() {
+func (h *helloService) helloFollowers() {
 
 	println("[helloFollowers]")
 	params := &twitter.FollowerListParams{}
@@ -28,7 +28,7 @@ func (h *HelloService) helloFollowers() {
 	println(followers.Users)
 }
 
-func (h *HelloService) helloSearchTweet() {
+func (h *helloService) helloSearchTweet() {
 
 	println("[helloSearch]")
 	results, _, err := h.c.Search.Tweets(&twitter.SearchTweetParams{Query: "hello"})
@@ -43,7 +43,7 @@ func (h *HelloService) helloSearchTweet() {
 
 }
 
-func (h *HelloService) helloSearchUsers() {
+func (h *helloService) helloSearchUsers() {
 
 	println("[helloSearchUsers]")
 	results, _, err := h.c.Users.Search("hello", nil)
@@ -63,7 +63,7 @@ func HelloPing(c *clientcredentials.Config) {
 	httpClient := c.Client(context.TODO())
 	client := twitter.NewClient(httpClient)
 
-	h := &HelloService{
+	h := &helloService{
 		c: client,
 	}
 
