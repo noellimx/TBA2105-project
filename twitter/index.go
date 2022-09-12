@@ -7,12 +7,9 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-func Some() {
+func HelloPing(c *clientcredentials.Config) {
 
-	config := &clientcredentials.Config{
-		TokenURL: "https://api.twitter.com/oauth2/token",
-	}
-	httpClient := config.Client(context.TODO())
+	httpClient := c.Client(context.TODO())
 
 	client := twitter.NewClient(httpClient)
 
