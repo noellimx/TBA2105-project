@@ -17,7 +17,7 @@ type GlobalConfig struct {
 
 func ReadConfig(path string) *GlobalConfig {
 	jsonFile, err := os.Open(path)
-	if err != nil {
+	if err != nil {	
 		log.Fatal("Error Reading Config from path. " + err.Error())
 	}
 	byteValue, err := ioutil.ReadAll(jsonFile)
