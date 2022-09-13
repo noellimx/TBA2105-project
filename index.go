@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,12 +13,19 @@ var CONFIG_PATH string = "./config.json"
 
 var globalConfig = config.ReadConfig(CONFIG_PATH)
 
+var haveClient = false
+
 type clientT struct {
 	c *http.Client
 }
 
 func NewClientT() (*clientT, error) {
+	if haveClient {
 
+		return nil, errors.New("math: square root of negative number")
+	}
+
+	haveClient = true
 	return &clientT{c: &http.Client{}}, nil
 }
 
@@ -41,7 +49,11 @@ func main() {
 
 	fmt.Printf("Global Config: %+v \n", globalConfig)
 
-	cT, _ := NewClientT()
+	cT, err := NewClientT()
+
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 
 	cT.getExample()
 
