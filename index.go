@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -80,6 +81,35 @@ func (ct *clientT) twitterExampleGetUserMe() {
 
 }
 
+func (ct *clientT) twitterExampleRecentSearch(query string) {
+
+	fmt.Println("[cT.twitterExampleRecentSearch]")
+	url := "https://api.twitter.com/2/tweets/search/recent"
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	q := req.URL.Query()
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
+
+	q.Add("query", query)
+	req.URL.RawQuery = q.Encode()
+	println(req.URL.RawQuery)
+	resp, err := ct.c.Do(req)
+
+	if err != nil {
+		basicFatal()
+	}
+	defer resp.Body.Close()
+
+	statusCode := resp.StatusCode
+
+	fmt.Printf("Status: %d \n", statusCode)
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	fmt.Printf("%s", body)
+
+}
+
 func main() {
 
 	fmt.Printf("Global Config: %+v \n", globalConfig)
@@ -92,4 +122,6 @@ func main() {
 
 	cT.getExample()
 	cT.twitterExampleGetUserMe()
+
+	cT.twitterExampleRecentSearch("hello")
 }
