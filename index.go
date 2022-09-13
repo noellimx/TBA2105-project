@@ -1,14 +1,21 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/noellimx/TBA2105-project.git/config"
 )
+
+var httpMethods = &struct {
+	post string
+	get  string
+}{post: "POST", get: "GEt"}
 
 func basicFatal() {
 	log.Fatalf("Error ")
@@ -101,20 +108,46 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 	statusCode := resp.StatusCode
 
 	fmt.Printf("Status: %d \n", statusCode)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	fmt.Printf("%s", body)
 }
 
-func (ct *clientT) twitterExampleFullArchiveSearch(query string) {
+func (ct *clientT) twitterExampleFullArchiveSearchV1(query string) {
+	/*
+
+
+		curl --request POST \
+		  --url https://api.twitter.com/1.1/tweets/search/30day/<ENV>.json \
+		  --header 'authorization: Bearer <BEARER_TOKEN>' \
+		  --header 'content-type: application/json' \
+		  --data '{
+		                "query":"from:TwitterDev lang:en",
+		                "maxResults": "100",
+		                "fromDate":"<YYYYMMDDHHmm>",
+		                "toDate":"<YYYYMMDDHHmm>"
+		                }'
+
+
+	*/
 
 	fmt.Println("[cT.twitterExampleFullArchiveSearch]")
-	url := "https://api.twitter.com/2/tweets/search/all"
 
-	req, _ := http.NewRequest("GET", url, nil)
+	postBody, _ := json.Marshal(map[string]string{
+		"query":    "from:TwitterDev lang:en",
+		"fromDate": "201811010000",
+		"toDate":   "201811060000",
+		"bucket":   "day",
+	})
+	responseBody := bytes.NewBuffer(postBody)
+
+	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/30day/%s/counts.json", ct.globalConfig.Twitter.DevEnvironment)
+
+	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
 
 	q := req.URL.Query()
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
+	req.Header.Add("Content-Type", "application/json")
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
@@ -129,7 +162,7 @@ func (ct *clientT) twitterExampleFullArchiveSearch(query string) {
 	statusCode := resp.StatusCode
 
 	fmt.Printf("Status: %d \n", statusCode)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	fmt.Printf("%s", body)
 }
@@ -145,9 +178,9 @@ func main() {
 	}
 
 	cT.getExample()
-	cT.twitterExampleGetUserMeV2()
+	// cT.twitterExampleGetUserMeV2()
 
-	cT.twitterExampleRecentSearchV2("hello")
+	// cT.twitterExampleRecentSearchV2("hello")
 
-	cT.twitterExampleFullArchiveSearch("hello")
+	cT.twitterExampleFullArchiveSearchV1("hello")
 }
