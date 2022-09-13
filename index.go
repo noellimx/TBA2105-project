@@ -178,9 +178,9 @@ func main() {
 	}
 
 	cT.getExample()
-	// cT.twitterExampleGetUserMeV2()
+	cT.twitterExampleGetUserMeV2()
 
-	// cT.twitterExampleRecentSearchV2("hello")
+	cT.twitterExampleRecentSearchV2("hello")
 
 	cT.twitterExampleFullArchiveSearchV1("hello")
 }
