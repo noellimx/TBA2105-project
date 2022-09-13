@@ -10,6 +10,7 @@ import (
 type GlobalConfig struct {
 	Twitter struct {
 		ClientKey    string `json:"client_key"`
+		Bearer       string `json:"bearer"`
 		ClientSecret string `json:"client_secret"`
 	} `json:"twitter"`
 }
