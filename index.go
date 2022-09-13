@@ -110,7 +110,7 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 	fmt.Printf("Status: %d \n", statusCode)
 	body, _ := io.ReadAll(resp.Body)
 
-	fmt.Printf("%s", body)
+	fmt.Printf("%s \n", body)
 }
 
 func (ct *clientT) twitterExampleFullArchiveSearchV1(query string) {
@@ -164,7 +164,7 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string) {
 	fmt.Printf("Status: %d \n", statusCode)
 	body, _ := io.ReadAll(resp.Body)
 
-	fmt.Printf("%s", body)
+	fmt.Printf("%s \n", body)
 }
 
 func main() {
