@@ -55,7 +55,7 @@ func (cT *clientT) getExample() {
 
 const myUsername string = "noellimx"
 
-func (ct *clientT) twitterExample() {
+func (ct *clientT) twitterExampleGetUserMe() {
 	fmt.Println("[cT.twitterExample]")
 
 	username := myUsername
@@ -91,5 +91,5 @@ func main() {
 	}
 
 	cT.getExample()
-	cT.twitterExample()
+	cT.twitterExampleGetUserMe()
 }
