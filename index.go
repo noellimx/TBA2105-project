@@ -23,6 +23,8 @@ func basicFatal() {
 }
 
 func vFatal(msg string) {
+
+	println("ABORTED")
 	log.Fatalf(msg)
 
 }
@@ -136,7 +138,7 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	hhmmStart := "0000"
 	hhmmEnd := "2359"
 
-	if 10 < maxResults || maxResults < 100 {
+	if !(10 <= maxResults && maxResults <= 100) {
 		maxResults = 100
 
 		fmt.Printf("invalid maxResults. Defaulted to %d\n", maxResults)
@@ -182,7 +184,9 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	fmt.Printf("[%s] Status: %d \n", fn_name, statusCode)
 
 	body, _ := io.ReadAll(resp.Body)
-
+	if statusCode != 200 {
+		vFatal(string(body))
+	}
 	writeBodyToPath := fmt.Sprintf("twitterExampleFullArchiveSearchV1-%s-%s-%s-%s-%s.json", postBodyMap["query"], postBodyMap["maxResults"], postBodyMap["fromDate"], postBodyMap["toDate"], next)
 	f, err := os.Create(writeBodyToPath)
 
@@ -199,20 +203,22 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	return bodyJSON.Next
 }
 
-func demos(cT *clientT) {
-	cT.getExample()
-	cT.twitterExampleGetUserMeV2()
-	cT.twitterExampleRecentSearchV2("hello")
-
-}
-func Demos(cT *clientT) {
-	demos(cT)
-}
-
 func (cT *clientT) getFullArchiveForTheSampleDay() {
 	next := ""
 	for {
 		next = cT.twitterExampleFullArchiveSearchV1("hello", "2012", "12", "01", next, 100)
+		if next == "" {
+			break
+		}
+		print("looping \n")
+	}
+
+}
+
+func (cT *clientT) getFullArchiveForTheSampleDayLocationSG() {
+	next := ""
+	for {
+		next = cT.twitterExampleFullArchiveSearchV1("LKY place_country:SG", "2012", "12", "01", next, 100)
 		if next == "" {
 			break
 		}
@@ -231,6 +237,16 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
+	cT.getFullArchiveForTheSampleDayLocationSG()
+}
+
+func (cT *clientT) demos() {
+	cT.getExample()
+	cT.twitterExampleGetUserMeV2()
+	cT.twitterExampleRecentSearchV2("hello")
 	cT.getFullArchiveForTheSampleDay()
 
+}
+func (cT *clientT) Demos() {
+	cT.demos()
 }
