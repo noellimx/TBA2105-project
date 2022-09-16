@@ -11,23 +11,21 @@ import (
 	"os"
 
 	"github.com/noellimx/TBA2105-project.git/config"
+	"github.com/noellimx/TBA2105-project.git/utils"
 )
+
+type requestParameters struct {
+}
+
+type response200FullArchiveSearch struct {
+	Next              string            `json:"next"`
+	RequestParameters requestParameters `json:"requestParameters"`
+}
 
 var httpMethods = &struct {
 	post string
 	get  string
 }{post: "POST", get: "GEt"}
-
-func basicFatal() {
-	log.Fatalf("Error ")
-}
-
-func vFatal(msg string) {
-
-	println("ABORTED")
-	log.Fatalf(msg)
-
-}
 
 var CONFIG_PATH string = "./config.json"
 
@@ -58,7 +56,7 @@ func (cT *clientT) getExample() {
 	resp, err := cT.c.Get("http://example.com")
 
 	if err != nil {
-		basicFatal()
+		utils.VFatal(err.Error())
 	}
 
 	defer resp.Body.Close()
@@ -84,7 +82,7 @@ func (ct *clientT) twitterExampleGetUserMeV2() {
 	resp, err := ct.c.Do(req)
 
 	if err != nil {
-		vFatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -109,7 +107,7 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 	resp, err := ct.c.Do(req)
 
 	if err != nil {
-		basicFatal()
+		utils.VFatal(err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -119,14 +117,6 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 	body, _ := io.ReadAll(resp.Body)
 
 	fmt.Printf("%s \n", body)
-}
-
-type requestParameters struct {
-}
-
-type response200FullArchiveSearch struct {
-	Next              string            `json:"next"`
-	RequestParameters requestParameters `json:"requestParameters"`
 }
 
 func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm string, dd string, next string, maxResults int) string {
@@ -174,7 +164,7 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	resp, err := ct.c.Do(req)
 
 	if err != nil {
-		basicFatal()
+		utils.VFatal(err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -185,13 +175,13 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 
 	body, _ := io.ReadAll(resp.Body)
 	if statusCode != 200 {
-		vFatal(string(body))
+		utils.VFatal(string(body))
 	}
 	writeBodyToPath := fmt.Sprintf("twitterExampleFullArchiveSearchV1-%s-%s-%s-%s-%s.json", postBodyMap["query"], postBodyMap["maxResults"], postBodyMap["fromDate"], postBodyMap["toDate"], next)
 	f, err := os.Create(writeBodyToPath)
 
 	if err != nil {
-		vFatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 
 	// 5. Process
