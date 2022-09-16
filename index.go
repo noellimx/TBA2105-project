@@ -119,34 +119,20 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 }
 
 func (ct *clientT) twitterExampleFullArchiveSearchV1(query string) {
-	/*
-
-
-		curl --request POST \
-		  --url https://api.twitter.com/1.1/tweets/search/30day/<ENV>.json \
-		  --header 'authorization: Bearer <BEARER_TOKEN>' \
-		  --header 'content-type: application/json' \
-		  --data '{
-		                "query":"from:TwitterDev lang:en",
-		                "maxResults": "100",
-		                "fromDate":"<YYYYMMDDHHmm>",
-		                "toDate":"<YYYYMMDDHHmm>"
-		                }'
-
-
-	*/
-
-	fmt.Println("[cT.twitterExampleFullArchiveSearch]")
+	fmt.Println("[cT.twitterExampleFullArchiveSearchV1]")
 
 	postBody, _ := json.Marshal(map[string]string{
-		"query":    "from:TwitterDev lang:en",
-		"fromDate": "201811010000",
-		"toDate":   "201811060000",
-		"bucket":   "day",
+		"query":      "from:TwitterDev lang:en",
+		"fromDate":   "201802010000",
+		"maxResults": "100",
+		"toDate":     "201802282359",
 	})
+
 	responseBody := bytes.NewBuffer(postBody)
 
-	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/30day/%s/counts.json", ct.globalConfig.Twitter.DevEnvironment)
+	fmt.Printf("Developer Environment -> %s \n", ct.globalConfig.Twitter.DevEnvironment)
+
+	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/fullarchive/%s.json", ct.globalConfig.Twitter.DevEnvironment)
 
 	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
 
