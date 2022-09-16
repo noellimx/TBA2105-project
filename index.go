@@ -209,7 +209,7 @@ func Demos(cT *clientT) {
 	demos(cT)
 }
 
-func getFullArchiveForTheSampleDay(cT *clientT) {
+func (cT *clientT) getFullArchiveForTheSampleDay() {
 	next := ""
 	for {
 		next = cT.twitterExampleFullArchiveSearchV1("hello", "2012", "12", "01", next, 100)
@@ -218,6 +218,7 @@ func getFullArchiveForTheSampleDay(cT *clientT) {
 		}
 		print("looping \n")
 	}
+
 }
 
 func main() {
@@ -230,6 +231,6 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	getFullArchiveForTheSampleDay(cT)
+	cT.getFullArchiveForTheSampleDay()
 
 }
