@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/noellimx/TBA2105-project.git/config"
 )
@@ -118,15 +119,30 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 	fmt.Printf("%s \n", body)
 }
 
-func (ct *clientT) twitterExampleFullArchiveSearchV1(query string) {
+func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm string, dd string, next string, maxResults int) string {
 	fmt.Println("[cT.twitterExampleFullArchiveSearchV1]")
 
-	postBody, _ := json.Marshal(map[string]string{
-		"query":      "from:TwitterDev lang:en",
-		"fromDate":   "201802010000",
-		"maxResults": "100",
-		"toDate":     "201802282359",
-	})
+	// Forming Post Body Map
+	hhmmStart := "0000"
+	hhmmEnd := "2359"
+
+	if 10 < maxResults || maxResults < 100 {
+		maxResults = 100
+
+		fmt.Printf("invalid maxResults. Defaulted to %d\n", maxResults)
+	}
+
+	postBodyMap := make(map[string]string)
+
+	postBodyMap["query"] = query
+	postBodyMap["fromDate"] = fmt.Sprintf("%s%s%s%s", yy, mm, dd, hhmmStart)
+	postBodyMap["toDate"] = fmt.Sprintf("%s%s%s%s", yy, mm, dd, hhmmEnd)
+	postBodyMap["maxResults"] = fmt.Sprintf("%d", maxResults)
+
+	if next != "" {
+		postBodyMap["next"] = next
+	}
+	postBody, _ := json.Marshal(postBodyMap)
 
 	responseBody := bytes.NewBuffer(postBody)
 
@@ -155,7 +171,44 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string) {
 	fmt.Printf("Status: %d \n", statusCode)
 	body, _ := io.ReadAll(resp.Body)
 
-	fmt.Printf("%s \n", body)
+	writeBodyToPath := fmt.Sprintf("twitterExampleFullArchiveSearchV1-%s-%s-%s-%s-%s.json", postBodyMap["query"], postBodyMap["maxResults"], postBodyMap["fromDate"], postBodyMap["toDate"], next)
+	f, err := os.Create(writeBodyToPath)
+
+	if err != nil {
+		vFatal(err.Error())
+	}
+
+	type requestParameters struct {
+	}
+	bodyJSON := &struct {
+		Next              string            `json:"next"`
+		RequestParameters requestParameters `json:"requestParameters"`
+	}{}
+	json.Unmarshal(body, bodyJSON)
+
+	f.Write(body)
+	return bodyJSON.Next
+}
+
+func demos(cT *clientT) {
+	cT.getExample()
+	cT.twitterExampleGetUserMeV2()
+	cT.twitterExampleRecentSearchV2("hello")
+
+}
+func Demos(cT *clientT) {
+	demos(cT)
+}
+
+func getFullArchiveForTheSampleDay(cT *clientT) {
+	next := ""
+	for {
+		next = cT.twitterExampleFullArchiveSearchV1("hello", "2012", "12", "01", next, 100)
+		if next == "" {
+			break
+		}
+		print("looping \n")
+	}
 }
 
 func main() {
@@ -168,8 +221,6 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	cT.getExample()
-	cT.twitterExampleGetUserMeV2()
-	cT.twitterExampleRecentSearchV2("hello")
-	cT.twitterExampleFullArchiveSearchV1("hello")
+	getFullArchiveForTheSampleDay(cT)
+
 }
