@@ -21,6 +21,11 @@ func basicFatal() {
 	log.Fatalf("Error ")
 }
 
+func vFatal(msg string) {
+	log.Fatalf(msg)
+
+}
+
 var CONFIG_PATH string = "./config.json"
 
 var globalConfig = config.ReadConfig(CONFIG_PATH)
@@ -76,7 +81,7 @@ func (ct *clientT) twitterExampleGetUserMeV2() {
 	resp, err := ct.c.Do(req)
 
 	if err != nil {
-		basicFatal()
+		vFatal(err.Error())
 	}
 	defer resp.Body.Close()
 
