@@ -1,6 +1,6 @@
 # Status
 
-Found fix but not yet tested
+Fixed
 
 # Behavior
 
