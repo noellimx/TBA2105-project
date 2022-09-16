@@ -119,10 +119,20 @@ func (ct *clientT) twitterExampleRecentSearchV2(query string) {
 	fmt.Printf("%s \n", body)
 }
 
-func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm string, dd string, next string, maxResults int) string {
-	fmt.Println("[cT.twitterExampleFullArchiveSearchV1]")
+type requestParameters struct {
+}
 
-	// Forming Post Body Map
+type response200FullArchiveSearch struct {
+	Next              string            `json:"next"`
+	RequestParameters requestParameters `json:"requestParameters"`
+}
+
+func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm string, dd string, next string, maxResults int) string {
+
+	fn_name := "[cT.twitterExampleFullArchiveSearchV1]"
+	fmt.Println(fn_name)
+
+	// 1. Forming Post Body Map
 	hhmmStart := "0000"
 	hhmmEnd := "2359"
 
@@ -143,11 +153,9 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 		postBodyMap["next"] = next
 	}
 	postBody, _ := json.Marshal(postBodyMap)
-
 	responseBody := bytes.NewBuffer(postBody)
 
-	fmt.Printf("Developer Environment -> %s \n", ct.globalConfig.Twitter.DevEnvironment)
-
+	// 2. Form HTTPS Request
 	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/fullarchive/%s.json", ct.globalConfig.Twitter.DevEnvironment)
 
 	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
@@ -159,6 +167,8 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
 	println(req.URL.RawQuery)
+
+	// 3. Execute Request
 	resp, err := ct.c.Do(req)
 
 	if err != nil {
@@ -166,9 +176,11 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	}
 	defer resp.Body.Close()
 
+	// 4. Read
 	statusCode := resp.StatusCode
 
-	fmt.Printf("Status: %d \n", statusCode)
+	fmt.Printf("[%s] Status: %d \n", fn_name, statusCode)
+
 	body, _ := io.ReadAll(resp.Body)
 
 	writeBodyToPath := fmt.Sprintf("twitterExampleFullArchiveSearchV1-%s-%s-%s-%s-%s.json", postBodyMap["query"], postBodyMap["maxResults"], postBodyMap["fromDate"], postBodyMap["toDate"], next)
@@ -178,12 +190,9 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 		vFatal(err.Error())
 	}
 
-	type requestParameters struct {
-	}
-	bodyJSON := &struct {
-		Next              string            `json:"next"`
-		RequestParameters requestParameters `json:"requestParameters"`
-	}{}
+	// 5. Process
+
+	bodyJSON := &response200FullArchiveSearch{}
 	json.Unmarshal(body, bodyJSON)
 
 	f.Write(body)
