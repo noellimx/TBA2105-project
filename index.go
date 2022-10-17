@@ -132,6 +132,10 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 		maxResults = 100
 
 		fmt.Printf("invalid maxResults. Defaulted to %d\n", maxResults)
+	} else {
+
+		fmt.Printf("valid maxResults. : %d\n", maxResults)
+
 	}
 
 	postBodyMap := make(map[string]string)
@@ -150,11 +154,14 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 	// 2. Form HTTPS Request
 	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/fullarchive/%s.json", ct.globalConfig.Twitter.DevEnvironment)
 
+	fmt.Println(url)
 	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
 
 	q := req.URL.Query()
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
 	req.Header.Add("Content-Type", "application/json")
+
+	fmt.Printf("Query: %s ", query)
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
@@ -188,7 +195,7 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 
 	bodyJSON := &response200FullArchiveSearch{}
 	json.Unmarshal(body, bodyJSON)
-
+	fmt.Printf("Writing to : %s", writeBodyToPath)
 	f.Write(body)
 	return bodyJSON.Next
 }
@@ -196,7 +203,7 @@ func (ct *clientT) twitterExampleFullArchiveSearchV1(query string, yy string, mm
 func (cT *clientT) getFullArchiveForTheSampleDay() {
 	next := ""
 	for {
-		next = cT.twitterExampleFullArchiveSearchV1("hello", "2012", "12", "01", next, 100)
+		next = cT.twitterExampleFullArchiveSearchV1("hello", "2021", "12", "01", next, 100)
 		if next == "" {
 			break
 		}
@@ -208,10 +215,14 @@ func (cT *clientT) getFullArchiveForTheSampleDay() {
 func (cT *clientT) getFullArchiveForTheSampleDayLocationSG() {
 	next := ""
 	for {
-		next = cT.twitterExampleFullArchiveSearchV1("LKY place_country:SG", "2012", "12", "01", next, 100)
+		next = cT.twitterExampleFullArchiveSearchV1("Hello", "2021", "12", "01", next, 100)
+
+		fmt.Printf("next: [%s]\n", next)
+
 		if next == "" {
 			break
 		}
+
 		print("looping \n")
 	}
 
