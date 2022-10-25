@@ -6,6 +6,7 @@ import (
 
 	"github.com/noellimx/TBA2105-project/collecting"
 	"github.com/noellimx/TBA2105-project/config"
+	"github.com/noellimx/TBA2105-project/storing"
 	"github.com/noellimx/TBA2105-project/wrangling"
 )
 
@@ -36,9 +37,11 @@ func main() {
 
 	once := 1
 
+	storing.SampleDBRun()
 	wrangling.LemmaJargonSample()
 
 	return
+
 	switch once {
 	case 1:
 		cT.GetNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, "20220925", "20221023")

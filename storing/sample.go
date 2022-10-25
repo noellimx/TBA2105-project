@@ -9,14 +9,13 @@ import (
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 )
 
-var dbFileName string = "tweets.db"
+var sampleDbFileName string = "sample.db"
 
 type DBCN struct {
 	db *sql.DB
 }
 
 func (dbcn *DBCN) insertStudent(code string, name string, program string) {
-
 	log.Println("Inserting student record ...")
 	insertStudentSQL := `INSERT INTO student(code, name, program) VALUES (?, ?, ?)`
 	statement, err := dbcn.db.Prepare(insertStudentSQL) // Prepare statement.
@@ -28,20 +27,31 @@ func (dbcn *DBCN) insertStudent(code string, name string, program string) {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+}
+
+func (dbcn *DBCN) addPennyToStudent(code string) {
+	query := `UPDATE student SET credit = credit + 1 WHERE code = ?` // SQL Statement for Create Table
+
+	statement, err := dbcn.db.Prepare(query) // Prepare statement.
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	statement.Exec(code)
 
 }
 
 func (dbcn *DBCN) createTableStudent() {
 
 	createStudentTableSQL := `CREATE TABLE student (
-		"idStudent" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
-		"code" TEXT,
+		"code" char(4) NOT NULL PRIMARY KEY,
 		"name" TEXT,
-		"program" TEXT		
+		"program" TEXT,
+		"credit" int DEFAULT 0
 	  );` // SQL Statement for Create Table
 
 	log.Println("Create student table...")
-	statement, err := db.Prepare(createStudentTableSQL) // Prepare SQL Statement
+	statement, err := dbcn.db.Prepare(createStudentTableSQL) // Prepare SQL Statement
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -50,19 +60,19 @@ func (dbcn *DBCN) createTableStudent() {
 
 }
 
-func sample() {
-	os.Remove(dbFileName) // I delete the file to avoid duplicated records.
+func SampleDBRun() {
+	os.Remove(sampleDbFileName) // I delete the file to avoid duplicated records.
 	// SQLite is a file based database.
 
 	log.Println("Creating db...")
-	file, err := os.Create(dbFileName) // Create SQLite file
+	file, err := os.Create(sampleDbFileName) // Create SQLite file
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	log.Printf("Database [%s] created", dbFileName)
+	log.Printf("Database [%s] created", sampleDbFileName)
 	file.Close()
 
-	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", dbFileName))
+	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", sampleDbFileName))
 	defer sqliteDatabase.Close() // Defer Closing the database
 
 	dbcn := &DBCN{
@@ -75,6 +85,7 @@ func sample() {
 	// INSERT RECORDS
 	dbcn.insertStudent("0001", "Liana Kim", "Bachelor")
 	dbcn.insertStudent("0002", "Glen Rangel", "Bachelor")
+	dbcn.addPennyToStudent("0002")
 
 	// DISPLAY INSERTED RECORDS
 	dbcn.displayStudents()
