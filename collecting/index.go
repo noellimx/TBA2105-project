@@ -8,24 +8,16 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/noellimx/TBA2105-project/config"
 	"github.com/noellimx/TBA2105-project/utils"
 )
 
-type requestParameters struct {
-}
-
-type response200FullArchiveSearch struct {
-	Next              string            `json:"next"`
-	RequestParameters requestParameters `json:"requestParameters"`
-}
-
 var httpMethods = &struct {
 	post string
 	get  string
 }{post: "POST", get: "GEt"}
-
 
 type ClientT struct {
 	c *http.Client
@@ -114,7 +106,7 @@ func (ct *ClientT) TwitterPremiumFullArchiveSearchV1(query string, yy string, mm
 
 	// 5. Process
 
-	bodyJSON := &response200FullArchiveSearch{}
+	bodyJSON := &SelectedMarshalledResponse{}
 	json.Unmarshal(body, bodyJSON)
 	fmt.Printf("Writing to : %s", writeBodyToPath)
 	f.Write(body)
@@ -185,14 +177,14 @@ func (ct *ClientT) twitterExample7DaysSearchV1Day(query string, yy string, mm st
 
 	// 5. Process
 
-	bodyJSON := &response200FullArchiveSearch{}
+	bodyJSON := &SelectedMarshalledResponse{}
 	json.Unmarshal(body, bodyJSON)
 	fmt.Printf("Writing to : %s", writeBodyToPath)
 	f.Write(body)
 	return bodyJSON.Next
 }
 
-func (ct *ClientT) twitterExample7DaysSearchVDayCustom(query string, s_date string, e_date string, next string, maxResults int, env string) string {
+func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string) string {
 
 	fn_name := "[cT.twitterExample7DaysSearchVDayCustom]"
 	fmt.Println(fn_name)
@@ -204,8 +196,8 @@ func (ct *ClientT) twitterExample7DaysSearchVDayCustom(query string, s_date stri
 	postBodyMap := make(map[string]string)
 
 	postBodyMap["query"] = query
-	postBodyMap["fromDate"] = fmt.Sprintf("%s%s", s_date, hhmmStart)
-	postBodyMap["toDate"] = fmt.Sprintf("%s%s", e_date, hhmmEnd)
+	postBodyMap["fromDate"] = fmt.Sprintf("%s%s", s_yyyymmdd, hhmmStart)
+	postBodyMap["toDate"] = fmt.Sprintf("%s%s", e_yyyymmdd, hhmmEnd)
 	postBodyMap["maxResults"] = fmt.Sprintf("%d", maxResults)
 
 	if next != "" {
@@ -232,7 +224,8 @@ func (ct *ClientT) twitterExample7DaysSearchVDayCustom(query string, s_date stri
 
 	// 3. Execute Request
 	resp, err := ct.c.Do(req)
-
+	fmt.Printf("remaing %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-reset")])
+	fmt.Printf("remaing %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-remaining")])
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
@@ -256,10 +249,13 @@ func (ct *ClientT) twitterExample7DaysSearchVDayCustom(query string, s_date stri
 
 	// 5. Process
 
-	bodyJSON := &response200FullArchiveSearch{}
+	bodyJSON := &SelectedMarshalledResponse{}
 	json.Unmarshal(body, bodyJSON)
+
 	fmt.Printf("Writing to : %s", writeBodyToPath)
-	f.Write(body)
+
+	data, _ := json.Marshal(bodyJSON)
+	f.Write(data)
 	return bodyJSON.Next
 }
 func (cT *ClientT) getFullArchiveForTheSampleDay() {
@@ -290,11 +286,12 @@ func (cT *ClientT) getPREMIUMFullArchiveForTheSampleDayLocationSG() {
 
 }
 
-func (cT *ClientT) getNonPREMIUM30DaysForTheSampleDayLocationSG() {
+func (cT *ClientT) getNonPREMIUM30DaysForTheSampleDayLocationSG(query string, yyyymmddFrom string) {
 
 	next := ""
+
 	for {
-		next = cT.twitterExample7DaysSearchV1Day("traffic geocode:1.4521061839361646,103.76931474572983,5mi", "2022", "09", "25", next, 100, "env2")
+		cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddFrom, "", 100, "env2")
 
 		fmt.Printf("next: [%s]\n", next)
 
@@ -306,15 +303,26 @@ func (cT *ClientT) getNonPREMIUM30DaysForTheSampleDayLocationSG() {
 
 }
 
-func (cT *ClientT) GetNonPREMIUM30DaysForTheSampleDayLocationSG_Once() {
-	// query := "traffic geocode:1.4521061839361646,103.76931474572983,5mi"
-	query := "jb customs OR woodlands checkpoint OR johor causeway point_radius:[103.7692886848949 1.4526057415829072 25mi]"
-	// query := "causeway traffic jam point_radius:[103.7692886848949 1.4526057415829072 25mi]"
+func (cT *ClientT) GetNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string) {
 
-	// query := "jb customs OR woodlands checkpoint OR johor causeway"
-	// cT.twitterExample7DaysSearchV1Day(query, "2022", "09", "25", "", 100, "env2")
+	cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, "env2")
+}
 
-	cT.twitterExample7DaysSearchVDayCustom(query, "20220925", "20221023", "", 100, "env2")
+func (cT *ClientT) GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query string, yyyymmddFrom string, yyyymmddTo string) {
+	next := ""
+	for {
+		fmt.Printf("[GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult] Searching in 2 secs... \n")
+		time.Sleep(2 * time.Second)
+		next = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, "env2")
+
+		fmt.Printf("next: [%s]\n", next)
+
+		if next == "" {
+			break
+		}
+		print("looping \n")
+	}
+
 }
 
 func (cT *ClientT) demos() {
