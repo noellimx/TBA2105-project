@@ -1,3 +1,3 @@
-module github.com/noellimx/TBA2105-project.git
+module github.com/noellimx/TBA2105-project
 
 go 1.19
