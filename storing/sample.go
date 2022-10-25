@@ -50,7 +50,7 @@ func (dbcn *DBCN) createTableStudent() {
 
 }
 
-func main() {
+func sample() {
 	os.Remove(dbFileName) // I delete the file to avoid duplicated records.
 	// SQLite is a file based database.
 
@@ -77,7 +77,7 @@ func main() {
 	dbcn.insertStudent("0002", "Glen Rangel", "Bachelor")
 
 	// DISPLAY INSERTED RECORDS
-	displayStudents(sqliteDatabase)
+	dbcn.displayStudents()
 }
 
 func createTable(db *sql.DB) {
