@@ -30,10 +30,10 @@ func main() {
 	// query := "jb customs OR woodlands checkpoint OR johor causeway"
 	// cT.twitterExample7DaysSearchV1Day(query, "2022", "09", "25", "", 100, "env2")
 
-	query := "jb customs OR woodlands checkpoint OR johor causeway point_radius:[103.7692886848949 1.4526057415829072 12mi]"
+	query := "jb customs OR woodlands checkpoint OR johor causeway OR causeway point_radius:[103.7692886848949 1.4526057415829072 12mi]"
 	// cT.getPREMIUMFullArchiveForTheSampleDayLocationSG()
 
-	once := 2
+	once := 1
 
 	switch once {
 	case 1:

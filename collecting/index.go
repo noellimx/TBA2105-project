@@ -253,7 +253,12 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	json.Unmarshal(body, bodyJSON)
 
 	fmt.Printf("Writing to : %s", writeBodyToPath)
-
+	for idx, result := range bodyJSON.Results {
+		if result.ExtendedTweet.FullText != "" {
+			fmt.Println("!! fulltext")
+			bodyJSON.Results[idx].Text = result.ExtendedTweet.FullText
+		}
+	}
 	data, _ := json.Marshal(bodyJSON)
 	f.Write(data)
 	return bodyJSON.Next
