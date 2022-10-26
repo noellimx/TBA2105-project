@@ -298,23 +298,6 @@ func (cT *ClientT) getPREMIUMFullArchiveForTheSampleDayLocationSG() {
 
 }
 
-func (cT *ClientT) getNonPREMIUM30DaysForTheSampleDayLocationSG(query string, yyyymmddFrom string) {
-
-	next := ""
-
-	for {
-		cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddFrom, "", 100, "env2")
-
-		fmt.Printf("next: [%s]\n", next)
-
-		if next == "" || true {
-			break
-		}
-		print("looping \n")
-	}
-
-}
-
 var nonPremiumEnv string = "env2"
 
 func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
