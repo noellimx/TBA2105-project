@@ -10,9 +10,7 @@ import (
 	"github.com/noellimx/TBA2105-project/utils"
 )
 
-type DateStrT string
-
-var dateStrLength int = 12
+var dateStrLength int = 10
 
 // %a %b %d %H:%M:%S +0000 %Y
 
@@ -72,13 +70,13 @@ func newTweetDB(idStr string, dateStr string, yyyy string, mm string, dd string,
 		return nil
 	}
 	return &typings.TweetDB{
-		IdStr:   idStr,
-		DateStr: dateStr,
-		Yyyy:    yyyy,
-		Mm:      mm,
-		Dd:      dd,
-		Hh:      hh,
-		Text:    text,
+		IdStr:      idStr,
+		Yyyymmddhh: dateStr,
+		Yyyy:       yyyy,
+		Mm:         mm,
+		Dd:         dd,
+		Hh:         hh,
+		Text:       text,
 	}
 }
 

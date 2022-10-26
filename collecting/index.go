@@ -315,17 +315,22 @@ func (cT *ClientT) getNonPREMIUM30DaysForTheSampleDayLocationSG(query string, yy
 
 }
 
-func (cT *ClientT) GetNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string) {
+var nonPremiumEnv string = "env2"
 
-	cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, "env2")
+func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
+
+	_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv)
+
+	dbcn.InsertTweets(tweetDBs)
+
 }
 
-func (cT *ClientT) GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query string, yyyymmddFrom string, yyyymmddTo string) {
+func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query string, yyyymmddFrom string, yyyymmddTo string) {
 	next := ""
 	for {
 		fmt.Printf("[GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult] Searching in 2 secs... \n")
 		time.Sleep(2 * time.Second)
-		next, _ = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, "env2")
+		next, _ = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, nonPremiumEnv)
 
 		fmt.Printf("next: [%s]\n", next)
 

@@ -16,7 +16,7 @@ type DBCN_Twitt struct {
 func (dbcn *DBCN_Twitt) createTableTweets() {
 	query := `CREATE TABLE tweets (
 		"id_str" VARCHAR(50) NOT NULL PRIMARY KEY,
-		"date_str" VARCHAR(` + fmt.Sprintf("%d", dateStrLength) + `) NOT NULL,
+		"yyyymmddhh" VARCHAR(` + fmt.Sprintf("%d", dateStrLength) + `) NOT NULL,
 		"yyyy" VARCHAR(4) NOT NULL,
 		"mm" CHAR(2) NOT NULL,
 		"dd" CHAR(2) NOT NULL,
@@ -24,7 +24,7 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 		"text" TEXT NOT NULL
 	  );`
 
-	log.Println("Create Tweets table...")
+	log.Println("Creating Tweets table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -34,27 +34,38 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 
 }
 
-func (dbcn *DBCN_Twitt) insertTweet(tweet *typings.TweetDB) {
+func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
+	for i, t := range tweets {
+		fmt.Printf("[InsertTweets] @index %d \n", i)
+		dbcn.InsertTweet(t)
+	}
+	fmt.Println("[InsertTweets] End\n")
+}
 
+func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
+
+	if tweet == nil {
+
+		fmt.Printf("[Insert Tweet] nil tweet. Returning with no-op. \n")
+		return
+	}
 	/*
-
-
 		"id_str" VARCHAR(50) NOT NULL PRIMARY KEY,
-				"date_str" VARCHAR(12) NOT NULL,
+				"yyyymmddhh" VARCHAR(12) NOT NULL,
 				"yyyy" VARCHAR(4) NOT NULL,
 				"mm" CHAR(2) NOT NULL,
 				"dd" CHAR(2) NOT NULL,
 				"hh" CHAR(2) NOT NULL,
 				"text" TEXT NOT NULL
 	*/
-	log.Println("Inserting tweets record ...")
+	log.Printf("[Insert Tweet] Inserting tweet record ... \n")
 
 	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?)`
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(tweet.IdStr, tweet.DateStr, tweet.Yyyy, tweet.Mm, tweet.Dd, tweet.Hh, tweet.Text)
+	_, err = statement.Exec(tweet.IdStr, tweet.Yyyymmddhh, tweet.Yyyy, tweet.Mm, tweet.Dd, tweet.Hh, tweet.Text)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

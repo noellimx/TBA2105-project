@@ -7,7 +7,6 @@ import (
 	"github.com/noellimx/TBA2105-project/collecting"
 	"github.com/noellimx/TBA2105-project/config"
 	"github.com/noellimx/TBA2105-project/storing"
-	"github.com/noellimx/TBA2105-project/wrangling"
 )
 
 var CONFIG_PATH string = "./config.json"
@@ -25,6 +24,8 @@ func main() {
 
 	}
 
+	dbcn := storing.InitTwitDB()
+
 	query := "jb customs OR woodlands checkpoint OR johor causeway OR causeway point_radius:[103.7692886848949 1.4526057415829072 12mi]"
 	// cT.getPREMIUMFullArchiveForTheSampleDayLocationSG()
 
@@ -32,17 +33,9 @@ func main() {
 
 	switch once {
 	case 1:
-		cT.GetNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, "20220925", "20221023")
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, "20220925", "20221023", dbcn)
 	case 2:
-		cT.GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, "20220925", "20221023")
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, "20220925", "20221023")
 	}
-
-	storing.InitTwitDB()
-
-	storing.SampleTwitDateToTimeDate()
-	return
-
-	storing.SampleDBRun()
-	wrangling.LemmaJargonSample()
 
 }
