@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/noellimx/TBA2105-project/config"
+	"github.com/noellimx/TBA2105-project/storing"
+	"github.com/noellimx/TBA2105-project/typings"
 	"github.com/noellimx/TBA2105-project/utils"
 )
 
@@ -184,7 +186,7 @@ func (ct *ClientT) twitterExample7DaysSearchV1Day(query string, yy string, mm st
 	return bodyJSON.Next
 }
 
-func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string) string {
+func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string) (string, []*typings.TweetDB) {
 
 	fn_name := "[cT.twitterExample7DaysSearchVDayCustom]"
 	fmt.Println(fn_name)
@@ -253,15 +255,20 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	json.Unmarshal(body, bodyJSON)
 
 	fmt.Printf("Writing to : %s", writeBodyToPath)
+
+	var tweetDBs []*typings.TweetDB
 	for idx, result := range bodyJSON.Results {
 		if result.ExtendedTweet.FullText != "" {
-			fmt.Println("!! fulltext")
 			bodyJSON.Results[idx].Text = result.ExtendedTweet.FullText
+
+			twDB := storing.ResulttoTweetDB(bodyJSON.Results[idx])
+
+			tweetDBs = append(tweetDBs, twDB)
 		}
 	}
 	data, _ := json.Marshal(bodyJSON)
 	f.Write(data)
-	return bodyJSON.Next
+	return bodyJSON.Next, tweetDBs
 }
 func (cT *ClientT) getFullArchiveForTheSampleDay() {
 	next := ""
@@ -318,7 +325,7 @@ func (cT *ClientT) GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query st
 	for {
 		fmt.Printf("[GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult] Searching in 2 secs... \n")
 		time.Sleep(2 * time.Second)
-		next = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, "env2")
+		next, _ = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, "env2")
 
 		fmt.Printf("next: [%s]\n", next)
 

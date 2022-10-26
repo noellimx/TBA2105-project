@@ -1,5 +1,7 @@
 package collecting
 
+import "github.com/noellimx/TBA2105-project/typings"
+
 type userMentionsResponse struct {
 	ScreenName string `json:"screen_name"`
 	Name       string `json:"name"`
@@ -109,28 +111,9 @@ type entitiesResponse struct {
 	Symbols      []interface{}          `json:"symbols"`
 }
 
-type responseResults struct {
-	CreatedAt     string `json:"created_at"`
-	Text          string `json:"text"`
-	Truncated     bool   `json:"truncated"`
-	ExtendedTweet struct {
-		FullText string `json:"full_text"`
-	} `json:"extended_tweet,omitempty"`
-
-	User struct {
-		ID         int64  `json:"id"`
-		ScreenName string `json:"screen_name"`
-	} `json:"user"`
-	RetweetedStatus struct {
-		ExtendedTweet struct {
-			FullText string `json:"full_text"`
-		} `json:"extended_tweet"`
-	} `json:"retweeted_status"`
-}
 type SelectedMarshalledResponse struct {
-	Results           []responseResults `json:"results"`
-	IdStr             string            `json:"id_str"`
-	Next              string            `json:"next"`
+	Results           []*typings.ResponseResults `json:"results"`
+	Next              string                     `json:"next"`
 	RequestParameters struct {
 		MaxResults int    `json:"maxResults"`
 		FromDate   string `json:"fromDate"`

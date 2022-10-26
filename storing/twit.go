@@ -6,6 +6,7 @@ import (
 	"log"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
+	"github.com/noellimx/TBA2105-project/typings"
 )
 
 type DBCN_Twitt struct {
@@ -15,7 +16,7 @@ type DBCN_Twitt struct {
 func (dbcn *DBCN_Twitt) createTableTweets() {
 	query := `CREATE TABLE tweets (
 		"id_str" VARCHAR(50) NOT NULL PRIMARY KEY,
-		"date_str" VARCHAR(12) NOT NULL,
+		"date_str" VARCHAR(` + fmt.Sprintf("%d", dateStrLength) + `) NOT NULL,
 		"yyyy" VARCHAR(4) NOT NULL,
 		"mm" CHAR(2) NOT NULL,
 		"dd" CHAR(2) NOT NULL,
@@ -33,7 +34,7 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 
 }
 
-func (dbcn *DBCN_Twitt) insertTweet(tweet *tweetDB) {
+func (dbcn *DBCN_Twitt) insertTweet(tweet *typings.TweetDB) {
 
 	/*
 
@@ -87,23 +88,5 @@ func InitTwitDB() *DBCN_Twitt {
 	dbcn := NewDBCN_Twitt(TwitDbFileName)
 	dbcn.createTableTweets() // Create Database Tables
 
-	dbcn.displayStudents()
-
 	return dbcn
-}
-
-func (dbcn DBCN_Twitt) displayStudents() {
-	row, err := dbcn.db.Query("SELECT * FROM student ORDER BY name")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer row.Close()
-	for row.Next() { // Iterate and fetch the records from result cursor
-		var id int
-		var code string
-		var name string
-		var program string
-		row.Scan(&id, &code, &name, &program)
-		log.Println("Student: ", code, " ", name, " ", program)
-	}
 }

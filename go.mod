@@ -6,6 +6,7 @@ require (
 	github.com/aaaton/golem/v4 v4.0.1
 	github.com/aaaton/golem/v4/dicts/en v1.0.1
 	github.com/clipperhouse/jargon v1.0.9
+	github.com/itchyny/timefmt-go v0.1.4
 	github.com/mattn/go-sqlite3 v1.14.15
 )
 
