@@ -11,11 +11,11 @@ import (
 
 var sampleDbFileName string = "sample.db"
 
-type DBCN struct {
+type DBCN_Sample struct {
 	db *sql.DB
 }
 
-func (dbcn *DBCN) insertStudent(code string, name string, program string) {
+func (dbcn *DBCN_Sample) insertStudent(code string, name string, program string) {
 	log.Println("Inserting student record ...")
 	insertStudentSQL := `INSERT INTO student(code, name, program) VALUES (?, ?, ?)`
 	statement, err := dbcn.db.Prepare(insertStudentSQL) // Prepare statement.
@@ -29,7 +29,7 @@ func (dbcn *DBCN) insertStudent(code string, name string, program string) {
 	}
 }
 
-func (dbcn *DBCN) addPennyToStudent(code string) {
+func (dbcn *DBCN_Sample) addPennyToStudent(code string) {
 	query := `UPDATE student SET credit = credit + 1 WHERE code = ?` // SQL Statement for Create Table
 
 	statement, err := dbcn.db.Prepare(query) // Prepare statement.
@@ -41,7 +41,7 @@ func (dbcn *DBCN) addPennyToStudent(code string) {
 
 }
 
-func (dbcn *DBCN) createTableStudent() {
+func (dbcn *DBCN_Sample) createTableStudent() {
 
 	createStudentTableSQL := `CREATE TABLE student (
 		"code" char(4) NOT NULL PRIMARY KEY,
@@ -60,26 +60,30 @@ func (dbcn *DBCN) createTableStudent() {
 
 }
 
-func SampleDBRun() {
-	os.Remove(sampleDbFileName) // I delete the file to avoid duplicated records.
-	// SQLite is a file based database.
+func newDBCN(dbFileName string) *DBCN_Sample {
+
+	os.Remove(dbFileName) // I delete the file to avoid duplicated records.
 
 	log.Println("Creating db...")
-	file, err := os.Create(sampleDbFileName) // Create SQLite file
+	file, err := os.Create(dbFileName) // Create SQLite file
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	log.Printf("Database [%s] created", sampleDbFileName)
+	log.Printf("Database [%s] created", dbFileName)
 	file.Close()
 
-	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", sampleDbFileName))
+	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", dbFileName))
 	defer sqliteDatabase.Close() // Defer Closing the database
 
-	dbcn := &DBCN{
+	return &DBCN_Sample{
 
 		db: sqliteDatabase,
 	}
+}
+func SampleDBRun() {
+	// SQLite is a file based database.
 
+	dbcn := newDBCN(sampleDbFileName)
 	dbcn.createTableStudent() // Create Database Tables
 
 	// INSERT RECORDS
@@ -91,24 +95,7 @@ func SampleDBRun() {
 	dbcn.displayStudents()
 }
 
-func createTable(db *sql.DB) {
-	createStudentTableSQL := `CREATE TABLE student (
-		"idStudent" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
-		"code" TEXT,
-		"name" TEXT,
-		"program" TEXT		
-	  );` // SQL Statement for Create Table
-
-	log.Println("Create student table...")
-	statement, err := db.Prepare(createStudentTableSQL) // Prepare SQL Statement
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	statement.Exec() // Execute SQL Statements
-	log.Println("student table created")
-}
-
-func (dbcn DBCN) displayStudents() {
+func (dbcn *DBCN_Sample) displayStudents() {
 	row, err := dbcn.db.Query("SELECT * FROM student ORDER BY name")
 	if err != nil {
 		log.Fatal(err)
