@@ -25,11 +25,6 @@ func main() {
 
 	}
 
-	// query := "traffic geocode:1.4521061839361646,103.76931474572983,5mi"
-
-	// query := "causeway traffic jam point_radius:[103.7692886848949 1.4526057415829072 25mi]"
-
-	// query := "jb customs OR woodlands checkpoint OR johor causeway"
 	// cT.twitterExample7DaysSearchV1Day(query, "2022", "09", "25", "", 100, "env2")
 
 	query := "jb customs OR woodlands checkpoint OR johor causeway OR causeway point_radius:[103.7692886848949 1.4526057415829072 12mi]"
@@ -37,10 +32,11 @@ func main() {
 
 	once := 1
 
+	storing.InitTwitDB()
+	return
+
 	storing.SampleDBRun()
 	wrangling.LemmaJargonSample()
-
-	return
 
 	switch once {
 	case 1:

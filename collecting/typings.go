@@ -129,6 +129,7 @@ type responseResults struct {
 }
 type SelectedMarshalledResponse struct {
 	Results           []responseResults `json:"results"`
+	IdStr             string            `json:"id_str"`
 	Next              string            `json:"next"`
 	RequestParameters struct {
 		MaxResults int    `json:"maxResults"`
