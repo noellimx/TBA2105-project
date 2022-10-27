@@ -19,11 +19,15 @@ func (dbcn *DBCN_Sample) insertStudent(code string, name string, program string)
 	log.Println("Inserting student record ...")
 	insertStudentSQL := `INSERT INTO student(code, name, program) VALUES (?, ?, ?)`
 	statement, err := dbcn.db.Prepare(insertStudentSQL) // Prepare statement.
+
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 	_, err = statement.Exec(code, name, program)
+
+	statement.Close()
+
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -96,17 +100,17 @@ func SampleDBRun() {
 }
 
 func (dbcn *DBCN_Sample) displayStudents() {
-	row, err := dbcn.db.Query("SELECT * FROM student ORDER BY name")
+	rows, err := dbcn.db.Query("SELECT * FROM student ORDER BY name")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer row.Close()
-	for row.Next() { // Iterate and fetch the records from result cursor
+	defer rows.Close()
+	for rows.Next() { // Iterate and fetch the records from result cursor
 		var id int
 		var code string
 		var name string
 		var program string
-		row.Scan(&id, &code, &name, &program)
+		rows.Scan(&id, &code, &name, &program)
 		log.Println("Student: ", code, " ", name, " ", program)
 	}
 }

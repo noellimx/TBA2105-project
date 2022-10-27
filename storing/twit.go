@@ -30,8 +30,95 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 		log.Fatal(err.Error())
 	}
 	statement.Exec()
+	statement.Close()
 	log.Println("Tweets table created")
 
+}
+
+// working software over comprehensive documentation
+// individuals and interactions over processes and tools
+// collaboration over contract negotiation
+// responding to change over following a plan
+
+func (dbcn *DBCN_Twitt) AddWordCounts(yyyymmddhh string, lemmas []string) {
+	for _, l := range lemmas {
+		dbcn.AddWordCount(yyyymmddhh, l)
+	}
+}
+
+func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string) {
+
+	row := dbcn.db.QueryRow("SELECT count FROM words WHERE yyyymmddhh=? AND word=?;", yyyymmddhh, lemma)
+
+	var count string
+
+	err := row.Scan(&count)
+
+	if err != nil {
+		fmt.Printf("[AddWordCount] Not found %s [%s]\n", yyyymmddhh, lemma)
+		dbcn.InsertWordCount(yyyymmddhh, lemma)
+	}
+
+	addQuery := `UPDATE words SET count = count + 1 WHERE yyyymmddhh=? AND word=?;`
+
+	statement, err := dbcn.db.Prepare(addQuery) // Prepare statement.
+
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	_, err = statement.Exec(yyyymmddhh, lemma)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	defer statement.Close()
+
+}
+
+func (dbcn *DBCN_Twitt) InsertWordCount(yyyymmddhh string, lemma string) {
+	fmt.Printf("[InsertWordCount]\n")
+	query := `INSERT INTO words(yyyymmddhh,word) VALUES (?, ?)`
+	statement, err := dbcn.db.Prepare(query)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	_, err = statement.Exec(yyyymmddhh, lemma)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	statement.Close()
+}
+
+func (dbcn *DBCN_Twitt) GetTweetsInTheHour(yyyymmddhh string) *[]string {
+	rows, _ := dbcn.db.Query("SELECT text FROM tweets WHERE yyyymmddhh=?;", yyyymmddhh)
+	defer rows.Close()
+
+	var texts []string
+	for rows.Next() { // Iterate and fetch the records from result cursor
+		var text string
+		rows.Scan(&text)
+		log.Printf("%s Text: %s \n", yyyymmddhh, text)
+		texts = append(texts, text)
+	}
+
+	return &texts
+}
+
+func (dbcn *DBCN_Twitt) CreateTableWords() {
+	query := `CREATE TABLE IF NOT EXISTS words (
+		"yyyymmddhh" VARCHAR(` + fmt.Sprintf("%d", dateStrLength) + `) NOT NULL,
+		"word" TEXT NOT NULL,
+		"count" INT NOT NULL DEFAULT 0
+	  );`
+
+	log.Println("Creating Words table...")
+	statement, err := dbcn.db.Prepare(query)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	statement.Exec()
+	statement.Close()
+	log.Println("Words table created if not exist")
 }
 
 func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
@@ -45,7 +132,6 @@ func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
 func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
 
 	if tweet == nil {
-
 		fmt.Printf("[Insert Tweet] nil tweet. Returning with no-op. \n")
 		return
 	}
@@ -71,21 +157,11 @@ func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
 	}
 }
 
-func (dbcn *DBCN_Twitt) addPennyToStudent(code string) {
+func NewDBCN_Twitt(dbFileName string, overwrite bool) *DBCN_Twitt {
 
-	// query := `UPDATE student SET credit = credit + 1 WHERE code = ?` // SQL Statement for Create Table
-
-	// statement, err := dbcn.db.Prepare(query) // Prepare statement.
-	// if err != nil {
-	// 	log.Fatalln(err.Error())
-	// }
-
-	// statement.Exec(code)
-
-}
-
-func NewDBCN_Twitt(dbFileName string) *DBCN_Twitt {
-	overwriteFilePath(dbFileName)
+	if overwrite {
+		overwriteFilePath(dbFileName)
+	}
 
 	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", dbFileName))
 
@@ -93,10 +169,10 @@ func NewDBCN_Twitt(dbFileName string) *DBCN_Twitt {
 		db: sqliteDatabase,
 	}
 }
-func InitTwitDB() *DBCN_Twitt {
+func InitTwitDB(overwrite bool) *DBCN_Twitt {
 	// SQLite is a file based database.
 
-	dbcn := NewDBCN_Twitt(TwitDbFileName)
+	dbcn := NewDBCN_Twitt(TwitDbFileName, true)
 	dbcn.createTableTweets() // Create Database Tables
 
 	return dbcn

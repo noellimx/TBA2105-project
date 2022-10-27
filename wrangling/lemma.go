@@ -5,7 +5,6 @@ package wrangling
 // get all strings and split to words (lemmatization)
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -13,11 +12,25 @@ import (
 )
 
 type typeLemmas struct {
-	text   string
-	lemmas []string
+	Text   string
+	Lemmas []string
 }
 
-func Lemmatize(text string) *typeLemmas {
+var blacklist []string = []string{" ", "(", ")", ".", "t.co", ":", ",", "http", "https", "/", "\n"}
+
+func shouldAppend(s string) bool {
+
+	for _, b := range blacklist {
+		if b == s {
+			return false
+		}
+	}
+
+	return true
+
+}
+
+func LemmatizeText(text string) *typeLemmas {
 
 	jargon.TokenizeString(text)
 	r := strings.NewReader(text)
@@ -34,12 +47,15 @@ func Lemmatize(text string) *typeLemmas {
 			break
 		}
 		lemma := LemmaGolemWord(token.String())
-		lemmas = append(lemmas, lemma)
+
+		if shouldAppend(lemma) {
+			lemmas = append(lemmas, lemma)
+		}
 	}
 
 	return &typeLemmas{
-		text:   text,
-		lemmas: lemmas,
+		Text:   text,
+		Lemmas: lemmas,
 	}
 }
 
@@ -49,6 +65,5 @@ func LemmaGolemWord(word string) string {
 	}
 	lemma := lemmatizer.Lemma(word)
 
-	fmt.Printf("[LemmaGolemWord] %s -> %s\n", word, lemma)
 	return lemma
 }
