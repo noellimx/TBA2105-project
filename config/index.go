@@ -3,8 +3,9 @@ package config
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"os"
+
+	"github.com/noellimx/TBA2105-project/utils"
 )
 
 type GlobalConfig struct {
@@ -19,11 +20,11 @@ type GlobalConfig struct {
 func ReadConfig(path string) *GlobalConfig {
 	jsonFile, err := os.Open(path)
 	if err != nil {
-		log.Fatal("Error Reading Config from path. " + err.Error())
+		utils.VFatal("Error Reading Config from path. " + err.Error())
 	}
 	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
-		log.Fatal(err)
+		utils.VFatal(err.Error())
 	}
 	globalConfig := GlobalConfig{}
 	json.Unmarshal(byteValue, &globalConfig)

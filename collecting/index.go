@@ -247,7 +247,7 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	if statusCode != 200 {
 		utils.VFatal(string(body))
 	}
-	writeBodyToPath := fmt.Sprintf("twitterExampleFullArchiveSearchV1-%s-%s-%s-%s-%s.json", postBodyMap["query"], postBodyMap["maxResults"], postBodyMap["fromDate"], postBodyMap["toDate"], next)
+	writeBodyToPath := fmt.Sprintf("twitterSearch1_1-%s-%s-%s.json", postBodyMap["fromDate"], postBodyMap["toDate"], next)
 	f, err := os.Create(writeBodyToPath)
 
 	if err != nil {
@@ -258,20 +258,19 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 
 	bodyJSON := &SelectedMarshalledResponse{}
 	json.Unmarshal(body, bodyJSON)
-
+	bodyJSON.RequestParameters.Query = postBodyMap["query"]
 	fmt.Printf("Writing to : %s", writeBodyToPath)
 
 	var tweetDBs []*typings.TweetDB
 	for idx, result := range bodyJSON.Results {
 		if result.ExtendedTweet.FullText != "" {
 			bodyJSON.Results[idx].Text = result.ExtendedTweet.FullText
-
 			twDB := storing.ResulttoTweetDB(bodyJSON.Results[idx])
-
 			tweetDBs = append(tweetDBs, twDB)
 		}
 	}
 	data, _ := json.Marshal(bodyJSON)
+
 	f.Write(data)
 	return bodyJSON.Next, tweetDBs
 }

@@ -2,8 +2,9 @@ package storing
 
 import (
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/noellimx/TBA2105-project/utils"
 )
 
 func overwriteFilePath(filename string) {
@@ -13,7 +14,7 @@ func overwriteFilePath(filename string) {
 	fmt.Println("Creating db...")
 	file, err := os.Create(filename) // Create SQLite file
 	if err != nil {
-		log.Fatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 	fmt.Printf("Database [%s] created", filename)
 	file.Close()

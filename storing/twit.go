@@ -3,10 +3,10 @@ package storing
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 	"github.com/noellimx/TBA2105-project/typings"
+	"github.com/noellimx/TBA2105-project/utils"
 )
 
 type DBCN_Twitt struct {
@@ -27,7 +27,7 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 	fmt.Println("Creating Tweets table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
-		log.Fatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 	statement.Exec()
 	statement.Close()
@@ -64,12 +64,12 @@ func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string) {
 	statement, err := dbcn.db.Prepare(addQuery) // Prepare statement.
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 
 	_, err = statement.Exec(yyyymmddhh, lemma)
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 	defer statement.Close()
 
@@ -80,11 +80,11 @@ func (dbcn *DBCN_Twitt) InsertWordCount(yyyymmddhh string, lemma string) {
 	query := `INSERT INTO words(yyyymmddhh,word) VALUES (?, ?)`
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 	_, err = statement.Exec(yyyymmddhh, lemma)
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 	statement.Close()
 }
@@ -114,7 +114,7 @@ func (dbcn *DBCN_Twitt) CreateTableWords() {
 	fmt.Println("Creating Words table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
-		log.Fatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 	statement.Exec()
 	statement.Close()
@@ -149,11 +149,11 @@ func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
 	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?)`
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 	_, err = statement.Exec(tweet.IdStr, tweet.Yyyymmddhh, tweet.Yyyy, tweet.Mm, tweet.Dd, tweet.Hh, tweet.Text)
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 }
 

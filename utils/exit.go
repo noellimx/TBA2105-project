@@ -10,5 +10,6 @@ func BasicFatal() {
 }
 func VFatal(msg string) {
 	fmt.Println("ABORTED")
+	fmt.Println(msg)
 	log.Fatalf(msg)
 }

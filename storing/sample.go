@@ -3,10 +3,10 @@ package storing
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
+	"github.com/noellimx/TBA2105-project/utils"
 )
 
 var sampleDbFileName string = "sample.db"
@@ -22,14 +22,15 @@ func (dbcn *DBCN_Sample) insertStudent(code string, name string, program string)
 
 	// This is good to avoid SQL injections
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
+
 	}
 	_, err = statement.Exec(code, name, program)
 
 	statement.Close()
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 }
 
@@ -38,7 +39,7 @@ func (dbcn *DBCN_Sample) addPennyToStudent(code string) {
 
 	statement, err := dbcn.db.Prepare(query) // Prepare statement.
 	if err != nil {
-		log.Fatalln(err.Error())
+		utils.VFatal(err.Error())
 	}
 
 	statement.Exec(code)
@@ -57,7 +58,7 @@ func (dbcn *DBCN_Sample) createTableStudent() {
 	fmt.Println("Create student table...")
 	statement, err := dbcn.db.Prepare(createStudentTableSQL) // Prepare SQL Statement
 	if err != nil {
-		log.Fatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 	statement.Exec() // Execute SQL Statements
 	fmt.Println("student table created")
@@ -71,7 +72,7 @@ func newDBCN(dbFileName string) *DBCN_Sample {
 	fmt.Println("Creating db...")
 	file, err := os.Create(dbFileName) // Create SQLite file
 	if err != nil {
-		log.Fatal(err.Error())
+		utils.VFatal(err.Error())
 	}
 	fmt.Printf("Database [%s] created", dbFileName)
 	file.Close()
@@ -102,7 +103,7 @@ func SampleDBRun() {
 func (dbcn *DBCN_Sample) displayStudents() {
 	rows, err := dbcn.db.Query("SELECT * FROM student ORDER BY name")
 	if err != nil {
-		log.Fatal(err)
+		utils.VFatal(err.Error())
 	}
 	defer rows.Close()
 	for rows.Next() { // Iterate and fetch the records from result cursor

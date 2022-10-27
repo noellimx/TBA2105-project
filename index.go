@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/noellimx/TBA2105-project/collecting"
 	"github.com/noellimx/TBA2105-project/config"
 	"github.com/noellimx/TBA2105-project/storing"
+	"github.com/noellimx/TBA2105-project/utils"
 	"github.com/noellimx/TBA2105-project/wrangling"
 )
 
@@ -22,7 +22,8 @@ func extractProject(mode extractMode) {
 	fmt.Printf("Global Config: %+v \n", globalConfig)
 	cT, err := collecting.GetGlobalClientT(globalConfig)
 	if err != nil {
-		log.Fatalf(err.Error())
+
+		utils.VFatal(err.Error())
 	}
 	dbcn := storing.InitTwitDB(true)
 

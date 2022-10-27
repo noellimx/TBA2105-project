@@ -118,5 +118,6 @@ type SelectedMarshalledResponse struct {
 		MaxResults int    `json:"maxResults"`
 		FromDate   string `json:"fromDate"`
 		ToDate     string `json:"toDate"`
+		Query      string `json:"query"`
 	} `json:"requestParameters"`
 }

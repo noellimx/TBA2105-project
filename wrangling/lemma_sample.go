@@ -6,10 +6,10 @@ package wrangling
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/clipperhouse/jargon"
+	"github.com/noellimx/TBA2105-project/utils"
 
 	"github.com/aaaton/golem/v4"
 	"github.com/aaaton/golem/v4/dicts/en"
@@ -32,7 +32,7 @@ func LemmaJargonSample() {
 			token, err := tokens.Next()
 			if err != nil {
 				// Because the source is I/O, errors are possible
-				log.Fatal(err)
+				utils.VFatal(err.Error())
 			}
 			if token == nil {
 				break

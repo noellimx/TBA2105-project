@@ -1,11 +1,71 @@
 [Extract]
 Global Config: &{Twitter:{ClientKey:iMKZwLkSRmadpYBJY1a2M84mr Bearer:AAAAAAAAAAAAAAAAAAAAAPObhAEAAAAAAI%2BtMFORmxN86Tl0ajnF3DtHbWQ%3DmtEmLQqoN26iCHsTdaHJiKbKXWkHT6x4CL52fzz7GYfzzYTvp5 ClientSecret:7p2aI9M4yGohN9k3mM1HHqRARoo6GcnK70QSF8AM74cUSh7cr4 DevEnvironment:env1}} 
+Creating db...
+Database [twitter-1027150457.db] createdCreating Tweets table...
+Tweets table created
 [cT.twitterSearch1_1]
 https://api.twitter.com/1.1/tweets/search/30day/env2.json
 [cT.twitterSearch1_1] Query: jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 12mi] 
 query=jb+checkpoint+OR+jb+causeway+OR+jb+customs+OR+woodlands+checkpoint+OR+woodlands+causeway+OR+woodlands+customs+OR+johor+checkpoint+OR+johor+causeway+OR+johor+customs+point_radius%3A%5B103.7692886848949+1.4526057415829072+12mi%5D
-[cT.twitterSearch1_1] Attempt to do client req: 0xc0000a80d0 
+[cT.twitterSearch1_1] Attempt to do client req: 0xc0000a8038 
 remaining []
 remaining []
 [[cT.twitterSearch1_1]] Status: 200 
-ABORTED
+Writing to : twitterSearch1_1-202210220000-202210232359-.json[DateTwitterToDateDB] Sun Oct 23 11:53:11 +0000 2022 -> 2022-10-23 11:53:11 +0000 UTC
+[ResulttoTweetDB]text A trip down memory lane - getting from Johor Bahru to Singapore on the Causeway https://t.co/HSN6CxMyRV #JohorBahru #Johor #Singapore #Causeway
+[ResulttoTweetDB]dateStr 2022102311
+[DateTwitterToDateDB] Sun Oct 23 04:58:32 +0000 2022 -> 2022-10-23 04:58:32 +0000 UTC
+[ResulttoTweetDB]text [Notice-ICA] Tailback of departure traffic from Malaysia at Woodlands Checkpoint has subsided. Travellers are advised to check One Motoring website before embarking on their journey. #SG_Alerts (12:57)
+----
+Sign up now at alerts.​sg and get alerts sent to you!
+[ResulttoTweetDB]dateStr 2022102304
+[DateTwitterToDateDB] Sat Oct 22 22:20:31 +0000 2022 -> 2022-10-22 22:20:31 +0000 UTC
+[ResulttoTweetDB]text [Notice-ICA] Heavy departure traffic at Woodlands Checkpoint due to tailback from Malaysia. Delays are expected. Please check One Motoring website before embarking on your journey. #SG_Alerts (06:19)
+[ResulttoTweetDB]dateStr 2022102222
+[DateTwitterToDateDB] Sat Oct 22 19:38:49 +0000 2022 -> 2022-10-22 19:38:49 +0000 UTC
+[ResulttoTweetDB]text Causeway bus travellers were seen jostling their way through Malaysia’s immigration building in Johor Bahru ahead of the Deepavali weekend https://t.co/HcN49Mp0fY
+[ResulttoTweetDB]dateStr 2022102219
+[DateTwitterToDateDB] Sat Oct 22 18:03:19 +0000 2022 -> 2022-10-22 18:03:19 +0000 UTC
+[ResulttoTweetDB]text The Johor–Singapore Causeway (1,056 m) that links Woodlands (Singapore 🇸🇬, rightwards) to Johor Bahru (Malaysia 🇲🇾, leftwards) across the Straits of Johor. 
+It serves as a road and rail link, as well as water piping into Singapore. 
+Photo: Oct. 15, 2022. 
+https://t.co/MLIKgcy4kO https://t.co/pHlihvOns5
+[ResulttoTweetDB]dateStr 2022102218
+[DateTwitterToDateDB] Sat Oct 22 17:04:34 +0000 2022 -> 2022-10-22 17:04:34 +0000 UTC
+[ResulttoTweetDB]text Causeway bus travellers were seen jostling their way through Malaysia’s immigration building in Johor Bahru ahead of the Deepavali weekend https://t.co/fkJRATddiS
+[ResulttoTweetDB]dateStr 2022102217
+[DateTwitterToDateDB] Sat Oct 22 13:30:18 +0000 2022 -> 2022-10-22 13:30:18 +0000 UTC
+[ResulttoTweetDB]text 1. Causeway bus travellers were seen jostling their way through Malaysia's immigration building in Johor Bahru ahead of the Deepavali weekend.
+ 
+Facebook videos showed people shouting as they were being shoved up the escalator and into the arrival hall. 
+
+📸:Gugan Zizou/ Facebook https://t.co/UlvdKfhwQ5
+[ResulttoTweetDB]dateStr 2022102213
+[DateTwitterToDateDB] Sat Oct 22 08:21:55 +0000 2022 -> 2022-10-22 08:21:55 +0000 UTC
+[ResulttoTweetDB]text MAYHEM AT JB CUSTOMS DURING DEEPAVALI LONG WEEKEND, PEOPLE SCREAMING &amp; PUSHING
+#Singapore #umbrage #spore #uncensored
+https://t.co/koux6zHPCx
+[ResulttoTweetDB]dateStr 2022102208
+[DateTwitterToDateDB] Sat Oct 22 06:44:32 +0000 2022 -> 2022-10-22 06:44:32 +0000 UTC
+[ResulttoTweetDB]text [Notice-ICA] Tailback of departure traffic from Malaysia at Woodlands Checkpoint has subsided. Travellers are advised to check One Motoring website before embarking on their journey. #SG_Alerts (14:43)
+[ResulttoTweetDB]dateStr 2022102206
+[InsertTweets] @index 0 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 1 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 2 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 3 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 4 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 5 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 6 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 7 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] @index 8 
+[Insert Tweet] Inserting tweet record ... 
+[InsertTweets] End
+
