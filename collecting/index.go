@@ -188,7 +188,7 @@ func (ct *ClientT) twitterExample7DaysSearchV1Day(query string, yy string, mm st
 
 func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string) (string, []*typings.TweetDB) {
 
-	fn_name := "[cT.twitterExample7DaysSearchVDayCustom]"
+	fn_name := "[cT.twitterSearch1_1]"
 	fmt.Println(fn_name)
 
 	// 1. Forming Post Body Map
@@ -218,17 +218,22 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
 	req.Header.Add("Content-Type", "application/json")
 
-	fmt.Printf("Query: %s ", query)
+	fmt.Printf("[cT.twitterSearch1_1] Query: %s \n", query)
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
-	println(req.URL.RawQuery)
+	fmt.Println(req.URL.RawQuery)
 
 	// 3. Execute Request
+
+	fmt.Printf("[cT.twitterSearch1_1] Attempt to do client req: %p \n", &req)
+
 	resp, err := ct.c.Do(req)
-	fmt.Printf("remaing %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-reset")])
-	fmt.Printf("remaing %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-remaining")])
+	fmt.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-reset")])
+	fmt.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-remaining")])
 	if err != nil {
+
+		fmt.Println("[cT.twitterSearch1_1] Do client request error")
 		utils.VFatal(err.Error())
 	}
 	defer resp.Body.Close()

@@ -15,6 +15,8 @@ var CONFIG_PATH string = "./config.json"
 
 var globalConfig = config.ReadConfig(CONFIG_PATH)
 
+var fromYYYYMMDD string = "20221022"
+
 func extractProject(mode extractMode) {
 	fmt.Println("[Extract]")
 	fmt.Printf("Global Config: %+v \n", globalConfig)
@@ -24,14 +26,14 @@ func extractProject(mode extractMode) {
 	}
 	dbcn := storing.InitTwitDB(true)
 
-	query := "jb customs OR woodlands checkpoint OR johor causeway OR causeway OR customs point_radius:[103.7692886848949 1.4526057415829072 12mi]"
+	query := "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 12mi]"
 	// cT.getPREMIUMFullArchiveForTheSampleDayLocationSG()
 
 	switch mode {
-	case extONCE:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, "20220925", "20221023", dbcn)
+	case extFIRST:
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, fromYYYYMMDD, "20221023", dbcn)
 	case extALL:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, "20220925", "20221023")
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, fromYYYYMMDD, "20221023")
 	}
 
 }
@@ -140,8 +142,8 @@ func processProject(fn string) {
 type extractMode int
 
 const (
-	extONCE extractMode = 1
-	extALL  extractMode = 2
+	extFIRST extractMode = 1
+	extALL   extractMode = 2
 )
 
 func main() {
@@ -161,16 +163,14 @@ func main() {
 	}
 
 	switch cmd {
-	case "extract":
-		extractProject(extONCE)
+	case "extract-first":
+		extractProject(extFIRST)
 	case "process":
-
 		if args_l < 2 {
 			fmt.Println("[Process] Please specify existing database")
 		}
 		filename := args[2]
 		processProject(filename)
-
 	default:
 		fmt.Println("command unrecognized")
 

@@ -1,0 +1,10 @@
+[Extract]
+Global Config: &{Twitter:{ClientKey:iMKZwLkSRmadpYBJY1a2M84mr Bearer:AAAAAAAAAAAAAAAAAAAAAPObhAEAAAAAAI%2BtMFORmxN86Tl0ajnF3DtHbWQ%3DmtEmLQqoN26iCHsTdaHJiKbKXWkHT6x4CL52fzz7GYfzzYTvp5 ClientSecret:7p2aI9M4yGohN9k3mM1HHqRARoo6GcnK70QSF8AM74cUSh7cr4 DevEnvironment:env1}} 
+[cT.twitterSearch1_1]
+https://api.twitter.com/1.1/tweets/search/30day/env2.json
+[cT.twitterSearch1_1] Query: jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 12mi] 
+query=jb+checkpoint+OR+jb+causeway+OR+jb+customs+OR+woodlands+checkpoint+OR+woodlands+causeway+OR+woodlands+customs+OR+johor+checkpoint+OR+johor+causeway+OR+johor+customs+point_radius%3A%5B103.7692886848949+1.4526057415829072+12mi%5D
+[cT.twitterSearch1_1] Attempt to do client req: 0xc000014030 
+remaining []
+remaining []
+[[cT.twitterSearch1_1]] Status: 200 
