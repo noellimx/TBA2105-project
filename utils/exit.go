@@ -1,11 +1,14 @@
 package utils
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 func BasicFatal() {
 	log.Fatalf("Error ")
 }
 func VFatal(msg string) {
-	println("ABORTED")
+	fmt.Println("ABORTED")
 	log.Fatalf(msg)
 }

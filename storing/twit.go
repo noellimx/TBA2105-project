@@ -24,14 +24,14 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 		"text" TEXT NOT NULL
 	  );`
 
-	log.Println("Creating Tweets table...")
+	fmt.Println("Creating Tweets table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	statement.Exec()
 	statement.Close()
-	log.Println("Tweets table created")
+	fmt.Println("Tweets table created")
 
 }
 
@@ -97,7 +97,7 @@ func (dbcn *DBCN_Twitt) GetTweetsInTheHour(yyyymmddhh string) *[]string {
 	for rows.Next() { // Iterate and fetch the records from result cursor
 		var text string
 		rows.Scan(&text)
-		log.Printf("%s Text: %s \n", yyyymmddhh, text)
+		fmt.Printf("%s Text: %s \n", yyyymmddhh, text)
 		texts = append(texts, text)
 	}
 
@@ -111,14 +111,14 @@ func (dbcn *DBCN_Twitt) CreateTableWords() {
 		"count" INT NOT NULL DEFAULT 0
 	  );`
 
-	log.Println("Creating Words table...")
+	fmt.Println("Creating Words table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	statement.Exec()
 	statement.Close()
-	log.Println("Words table created if not exist")
+	fmt.Println("Words table created if not exist")
 }
 
 func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
@@ -144,7 +144,7 @@ func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
 				"hh" CHAR(2) NOT NULL,
 				"text" TEXT NOT NULL
 	*/
-	log.Printf("[Insert Tweet] Inserting tweet record ... \n")
+	fmt.Printf("[Insert Tweet] Inserting tweet record ... \n")
 
 	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?)`
 	statement, err := dbcn.db.Prepare(query)

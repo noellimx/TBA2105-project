@@ -16,7 +16,7 @@ type DBCN_Sample struct {
 }
 
 func (dbcn *DBCN_Sample) insertStudent(code string, name string, program string) {
-	log.Println("Inserting student record ...")
+	fmt.Println("Inserting student record ...")
 	insertStudentSQL := `INSERT INTO student(code, name, program) VALUES (?, ?, ?)`
 	statement, err := dbcn.db.Prepare(insertStudentSQL) // Prepare statement.
 
@@ -54,13 +54,13 @@ func (dbcn *DBCN_Sample) createTableStudent() {
 		"credit" int DEFAULT 0
 	  );` // SQL Statement for Create Table
 
-	log.Println("Create student table...")
+	fmt.Println("Create student table...")
 	statement, err := dbcn.db.Prepare(createStudentTableSQL) // Prepare SQL Statement
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	statement.Exec() // Execute SQL Statements
-	log.Println("student table created")
+	fmt.Println("student table created")
 
 }
 
@@ -68,12 +68,12 @@ func newDBCN(dbFileName string) *DBCN_Sample {
 
 	os.Remove(dbFileName) // I delete the file to avoid duplicated records.
 
-	log.Println("Creating db...")
+	fmt.Println("Creating db...")
 	file, err := os.Create(dbFileName) // Create SQLite file
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	log.Printf("Database [%s] created", dbFileName)
+	fmt.Printf("Database [%s] created", dbFileName)
 	file.Close()
 
 	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", dbFileName))
@@ -111,6 +111,6 @@ func (dbcn *DBCN_Sample) displayStudents() {
 		var name string
 		var program string
 		rows.Scan(&id, &code, &name, &program)
-		log.Println("Student: ", code, " ", name, " ", program)
+		fmt.Println("Student: ", code, " ", name, " ", program)
 	}
 }
