@@ -17,6 +17,8 @@ var globalConfig = config.ReadConfig(CONFIG_PATH)
 
 var fromYYYYMMDD string = "20221022"
 
+var query string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 12mi]"
+
 func extractProject(mode extractMode) {
 	fmt.Println("[Extract]")
 	fmt.Printf("Global Config: %+v \n", globalConfig)
@@ -26,9 +28,6 @@ func extractProject(mode extractMode) {
 		utils.VFatal(err.Error())
 	}
 	dbcn := storing.InitTwitDB(true)
-
-	query := "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 12mi]"
-	// cT.getPREMIUMFullArchiveForTheSampleDayLocationSG()
 
 	switch mode {
 	case extFIRST:
@@ -144,7 +143,8 @@ type extractMode int
 
 const (
 	extFIRST extractMode = 1
-	extALL   extractMode = 2
+	extTWO   extractMode = 2
+	extALL   extractMode = 3
 )
 
 func main() {
@@ -166,6 +166,8 @@ func main() {
 	switch cmd {
 	case "extract-first":
 		extractProject(extFIRST)
+	case "extract-two":
+		extractProject(extTWO)
 	case "process":
 		if args_l < 2 {
 			fmt.Println("[Process] Please specify existing database")
@@ -174,7 +176,5 @@ func main() {
 		processProject(filename)
 	default:
 		fmt.Println("command unrecognized")
-
 	}
-
 }

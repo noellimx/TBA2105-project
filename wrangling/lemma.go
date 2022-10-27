@@ -16,7 +16,7 @@ type typeLemmas struct {
 	Lemmas []string
 }
 
-var blacklist []string = []string{" ", "(", ")", ".", "t.co", ":", ",", "http", "https", "/", "\n"}
+var blacklist []string = []string{" ", "(", ")", ".", "t.co", ":", ",", "http", "https", "/", "\n", "[", "]", "#"}
 
 func shouldAppend(s string) bool {
 
