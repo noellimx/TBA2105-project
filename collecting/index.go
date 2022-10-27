@@ -31,6 +31,11 @@ var haveClient = false
 
 var globalClient *ClientT
 
+const (
+	searchMode_30Days = "30day"
+	searchMode_Full   = "fullarchive"
+)
+
 func GetGlobalClientT(globalConfig *config.GlobalConfig) (*ClientT, error) {
 	if haveClient {
 
@@ -42,7 +47,7 @@ func GetGlobalClientT(globalConfig *config.GlobalConfig) (*ClientT, error) {
 	return globalClient, nil
 }
 
-func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string) (string, []*typings.TweetDB) {
+func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string, mode string) (string, []*typings.TweetDB) {
 
 	fn_name := "[cT.twitterSearch1_1]"
 	fmt.Println(fn_name)
@@ -65,7 +70,7 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	responseBody := bytes.NewBuffer(postBody)
 
 	// 2. Form HTTPS Request
-	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/30day/%s.json", env)
+	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/%s/%s.json", mode, env)
 
 	fmt.Println(url)
 	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
@@ -135,7 +140,7 @@ var nonPremiumEnv string = "env2"
 
 func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
 
-	_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv)
+	_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv, searchMode_30Days)
 
 	dbcn.InsertTweets(tweetDBs)
 
@@ -143,12 +148,12 @@ func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResul
 
 func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_TwoResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
 
-	next, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv)
+	next, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv, searchMode_30Days)
 
 	dbcn.InsertTweets(tweetDBs)
 
 	if next != "" {
-		_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv)
+		_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, nonPremiumEnv, searchMode_30Days)
 		dbcn.InsertTweets(tweetDBs)
 	}
 }
@@ -158,7 +163,7 @@ func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(
 	for {
 		fmt.Printf("[GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult] Searching in 2 secs... \n")
 		time.Sleep(2 * time.Second)
-		next, _ = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, nonPremiumEnv)
+		next, _ = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, nonPremiumEnv, searchMode_30Days)
 
 		fmt.Printf("next: [%s]\n", next)
 

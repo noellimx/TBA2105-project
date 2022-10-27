@@ -13,7 +13,7 @@ type DBCN_Twitt struct {
 	db *sql.DB
 }
 
-func (dbcn *DBCN_Twitt) createTableTweets() {
+func (dbcn *DBCN_Twitt) createTableTweet() {
 	query := `CREATE TABLE tweets (
 		"id_str" VARCHAR(50) NOT NULL PRIMARY KEY,
 		"yyyymmddhh" VARCHAR(` + fmt.Sprintf("%d", dateStrLength) + `) NOT NULL,
@@ -21,7 +21,8 @@ func (dbcn *DBCN_Twitt) createTableTweets() {
 		"mm" CHAR(2) NOT NULL,
 		"dd" CHAR(2) NOT NULL,
 		"hh" CHAR(2) NOT NULL,
-		"text" TEXT NOT NULL
+		"text" TEXT NOT NULL,
+		"retweet_or_fav_count" INT NOT NULL
 	  );`
 
 	fmt.Println("Creating Tweets table...")
@@ -126,7 +127,7 @@ func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
 		fmt.Printf("[InsertTweets] @index %d \n", i)
 		dbcn.InsertTweet(t)
 	}
-	fmt.Println("[InsertTweets] End\n")
+	fmt.Println("[InsertTweets] End")
 }
 
 func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
@@ -135,23 +136,15 @@ func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
 		fmt.Printf("[Insert Tweet] nil tweet. Returning with no-op. \n")
 		return
 	}
-	/*
-		"id_str" VARCHAR(50) NOT NULL PRIMARY KEY,
-				"yyyymmddhh" VARCHAR(12) NOT NULL,
-				"yyyy" VARCHAR(4) NOT NULL,
-				"mm" CHAR(2) NOT NULL,
-				"dd" CHAR(2) NOT NULL,
-				"hh" CHAR(2) NOT NULL,
-				"text" TEXT NOT NULL
-	*/
+
 	fmt.Printf("[Insert Tweet] Inserting tweet record ... \n")
 
-	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
-	_, err = statement.Exec(tweet.IdStr, tweet.Yyyymmddhh, tweet.Yyyy, tweet.Mm, tweet.Dd, tweet.Hh, tweet.Text)
+	_, err = statement.Exec(tweet.IdStr, tweet.Yyyymmddhh, tweet.Yyyy, tweet.Mm, tweet.Dd, tweet.Hh, tweet.Text, tweet.RetweetOrFavCount)
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
@@ -173,7 +166,7 @@ func InitTwitDB(overwrite bool) *DBCN_Twitt {
 	// SQLite is a file based database.
 
 	dbcn := NewDBCN_Twitt(TwitDbFileName, true)
-	dbcn.createTableTweets() // Create Database Tables
+	dbcn.createTableTweet() // Create Database Tables
 
 	return dbcn
 }

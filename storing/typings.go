@@ -58,11 +58,11 @@ func ResulttoTweetDB(c *typings.ResponseResults) *typings.TweetDB {
 	fmt.Printf("[ResulttoTweetDB]dateStr %s\n", dateStr)
 
 	// return newTweetDB(c.IdStr, )
-
-	return newTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text)
+	retweetOrFavCount := c.FavoriteCount + c.RetweetCount
+	return newTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text, retweetOrFavCount)
 
 }
-func newTweetDB(idStr string, dateStr string, yyyy string, mm string, dd string, hh string, text string) *typings.TweetDB {
+func newTweetDB(idStr string, dateStr string, yyyy string, mm string, dd string, hh string, text string, rtFC int) *typings.TweetDB {
 
 	ok := validateTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text)
 
@@ -70,13 +70,14 @@ func newTweetDB(idStr string, dateStr string, yyyy string, mm string, dd string,
 		return nil
 	}
 	return &typings.TweetDB{
-		IdStr:      idStr,
-		Yyyymmddhh: dateStr,
-		Yyyy:       yyyy,
-		Mm:         mm,
-		Dd:         dd,
-		Hh:         hh,
-		Text:       text,
+		IdStr:             idStr,
+		Yyyymmddhh:        dateStr,
+		Yyyy:              yyyy,
+		Mm:                mm,
+		Dd:                dd,
+		Hh:                hh,
+		Text:              text,
+		RetweetOrFavCount: rtFC,
 	}
 }
 

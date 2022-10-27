@@ -8,4 +8,5 @@ type TweetDB struct {
 	Dd         string
 	Hh         string
 	Text       string
+	RetweetOrFavCount int
 }

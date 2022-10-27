@@ -15,9 +15,10 @@ var CONFIG_PATH string = "./config.json"
 
 var globalConfig = config.ReadConfig(CONFIG_PATH)
 
-var fromYYYYMMDD string = "20221022"
+var YYYYMMDDFrom string = "20221001"
+var YYYYMMDDTo string = "20221025"
 
-var query string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 12mi]"
+var query string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 25mi]"
 
 func extractProject(mode extractMode) {
 	fmt.Println("[Extract]")
@@ -31,9 +32,11 @@ func extractProject(mode extractMode) {
 
 	switch mode {
 	case extFIRST:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, fromYYYYMMDD, "20221023", dbcn)
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, YYYYMMDDFrom, YYYYMMDDTo, dbcn)
+	case extTWO:
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_TwoResult(query, YYYYMMDDFrom, YYYYMMDDTo, dbcn)
 	case extALL:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, fromYYYYMMDD, "20221023")
+		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, YYYYMMDDFrom, YYYYMMDDTo)
 	}
 
 }

@@ -3,7 +3,8 @@ package typings
 type ResponseResults struct {
 	CreatedAt string `json:"created_at"`
 	IdStr     string `json:"id_str"`
-
+	RetweetCount  int              `json:"retweet_count"`
+	FavoriteCount int              `json:"favorite_count"`
 	Text          string `json:"text"`
 	Truncated     bool   `json:"truncated"`
 	ExtendedTweet struct {
