@@ -41,26 +41,26 @@ func (dbcn *DBCN_Twitt) createTableTweet() {
 // collaboration over contract negotiation
 // responding to change over following a plan
 
-func (dbcn *DBCN_Twitt) AddWordCounts(yyyymmddhh string, lemmas []string) {
+func (dbcn *DBCN_Twitt) AddWordCounts(yyyymmddhh string, lemmas []string, retweetOrFavCount int) {
 	for _, l := range lemmas {
-		dbcn.AddWordCount(yyyymmddhh, l)
+		dbcn.AddWordCount(yyyymmddhh, l, retweetOrFavCount+1)
 	}
 }
 
-func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string) {
+func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string, retweetOrFavCount int) {
 
 	row := dbcn.db.QueryRow("SELECT count FROM words WHERE yyyymmddhh=? AND word=?;", yyyymmddhh, lemma)
 
-	var count string
+	var existingCount string
 
-	err := row.Scan(&count)
+	err := row.Scan(&existingCount)
 
 	if err != nil {
 		fmt.Printf("[AddWordCount] Not found %s [%s]\n", yyyymmddhh, lemma)
 		dbcn.InsertWordCount(yyyymmddhh, lemma)
 	}
 
-	addQuery := `UPDATE words SET count = count + 1 WHERE yyyymmddhh=? AND word=?;`
+	addQuery := `UPDATE words SET count = count + ? WHERE yyyymmddhh=? AND word=?;`
 
 	statement, err := dbcn.db.Prepare(addQuery) // Prepare statement.
 
@@ -68,7 +68,9 @@ func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string) {
 		utils.VFatal(err.Error())
 	}
 
-	_, err = statement.Exec(yyyymmddhh, lemma)
+	countToAdd := 1 + retweetOrFavCount
+
+	_, err = statement.Exec(countToAdd, yyyymmddhh, lemma)
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
@@ -90,19 +92,32 @@ func (dbcn *DBCN_Twitt) InsertWordCount(yyyymmddhh string, lemma string) {
 	statement.Close()
 }
 
-func (dbcn *DBCN_Twitt) GetTweetsInTheHour(yyyymmddhh string) *[]string {
-	rows, _ := dbcn.db.Query("SELECT text FROM tweets WHERE yyyymmddhh=?;", yyyymmddhh)
+type PText struct {
+	Text              string
+	RetweetOrFavCount int
+}
+
+func (dbcn *DBCN_Twitt) GetTweetsInTheHour(yyyymmddhh string) *[]*PText {
+	rows, _ := dbcn.db.Query("SELECT text, retweet_or_fav_count FROM tweets WHERE yyyymmddhh=?;", yyyymmddhh)
 	defer rows.Close()
 
-	var texts []string
+	var Ptexts []*PText
 	for rows.Next() { // Iterate and fetch the records from result cursor
 		var text string
-		rows.Scan(&text)
-		fmt.Printf("%s Text: %s \n", yyyymmddhh, text)
-		texts = append(texts, text)
+
+		var rtFC int
+		rows.Scan(&text, &rtFC)
+
+		fmt.Printf("%s Text: %s Count: %d\n", yyyymmddhh, text, rtFC)
+
+		ptext := &PText{
+			Text:              text,
+			RetweetOrFavCount: rtFC,
+		}
+		Ptexts = append(Ptexts, ptext)
 	}
 
-	return &texts
+	return &Ptexts
 }
 
 func (dbcn *DBCN_Twitt) CreateTableWords() {

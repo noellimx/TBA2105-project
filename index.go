@@ -123,19 +123,21 @@ func processProject(fn string) {
 
 	dbcn.CreateTableWords()
 
-	tt := newTTime(2022, 10, 16, 0)
+	tt := newTTime(2022, 10, 1, 0)
 
-	for i := 0; i < 24*23; i++ {
+	hours := 24
+	days := 30
+	for i := 0; i < hours*days; i++ {
 
 		yyyymmddhh := tt.AsString()
-		texts := dbcn.GetTweetsInTheHour(yyyymmddhh)
+		ptexts := dbcn.GetTweetsInTheHour(yyyymmddhh)
 
-		for _, text := range *texts {
+		for _, ptext := range *ptexts {
 
-			lemmasT := wrangling.LemmatizeText(text)
+			lemmasT := wrangling.LemmatizeText(ptext.Text)
 			lemmas := lemmasT.Lemmas
 
-			dbcn.AddWordCounts(yyyymmddhh, lemmas)
+			dbcn.AddWordCounts(yyyymmddhh, lemmas, ptext.RetweetOrFavCount)
 		}
 		tt.JumpHour()
 	}
