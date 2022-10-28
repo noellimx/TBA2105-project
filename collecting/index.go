@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -69,7 +70,7 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	endpoint := devEnv.Endpoint
 
 	fn_name := "[cT.twitterSearch1_1]"
-	fmt.Println(fn_name)
+	log.Println(fn_name)
 
 	// 1. Forming Post Body Map
 	hhmmStart := "0000"
@@ -91,29 +92,29 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	// 2. Form HTTPS Request
 	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/%s/%s.json", endpoint, env)
 
-	fmt.Println(url)
+	log.Println(url)
 	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
 
 	q := req.URL.Query()
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
 	req.Header.Add("Content-Type", "application/json")
 
-	fmt.Printf("[cT.twitterSearch1_1] Query: %s \n", query)
+	log.Printf("[cT.twitterSearch1_1] Query: %s \n", query)
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
-	fmt.Println(req.URL.RawQuery)
+	log.Println(req.URL.RawQuery)
 
 	// 3. Execute Request
 
-	fmt.Printf("[cT.twitterSearch1_1] Attempt to do client req: %p \n", &req)
+	log.Printf("[cT.twitterSearch1_1] Attempt to do client req: %p \n", &req)
 
 	resp, err := ct.c.Do(req)
-	fmt.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-reset")])
-	fmt.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-remaining")])
+	log.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-reset")])
+	log.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-remaining")])
 	if err != nil {
 
-		fmt.Println("[cT.twitterSearch1_1] Do client request error")
+		log.Println("[cT.twitterSearch1_1] Do client request error")
 		utils.VFatal(err.Error())
 	}
 	defer resp.Body.Close()
@@ -121,7 +122,7 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	// 4. Read
 	statusCode := resp.StatusCode
 
-	fmt.Printf("[%s] Status: %d \n", fn_name, statusCode)
+	log.Printf("[%s] Status: %d \n", fn_name, statusCode)
 
 	body, _ := io.ReadAll(resp.Body)
 	if statusCode != 200 {
@@ -139,7 +140,7 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	bodyJSON := &SelectedMarshalledResponse{}
 	json.Unmarshal(body, bodyJSON)
 	bodyJSON.RequestParameters.Query = postBodyMap["query"]
-	fmt.Printf("Writing to : %s", writeBodyToPath)
+	log.Printf("Writing to : %s", writeBodyToPath)
 
 	var tweetDBs []*typings.TweetDB
 	for idx, result := range bodyJSON.Results {
@@ -169,19 +170,19 @@ func (cT *ClientTWit) GetAndStore(query string, yyyymmddFrom string, yyyymmddTo 
 
 	if devEnv.RequestCount == -1 {
 		infinite = true
-		fmt.Printf("[GetAndStore] [%d](Infinite request cycles) \n", devEnv.RequestCount)
+		log.Printf("[GetAndStore] [%d](Infinite request cycles) \n", devEnv.RequestCount)
 	}
 
-	fmt.Printf("[GetAndStore] %s\n", devEnv.Env)
+	log.Printf("[GetAndStore] %s\n", devEnv.Env)
 
 	for infinite || devEnv.RequestCount > 0 {
-		fmt.Printf("[GetAndStore] RemainingRequest[%d] Searching in 2 secs... \n", devEnv.RequestCount)
+		log.Printf("[GetAndStore] RemainingRequest[%d] Searching in 2 secs... \n", devEnv.RequestCount)
 		time.Sleep(2 * time.Second)
 		next_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, devEnv)
 		next = next_
 		cT.Dbcn.InsertTweets(tweetDBs)
 
-		fmt.Printf("next: [%s]\n", next_)
+		log.Printf("next: [%s]\n", next_)
 
 		if next_ == "" {
 			break

@@ -5,7 +5,7 @@ package wrangling
 // get all strings and split to words (lemmatization)
 
 import (
-	"fmt"
+	"log"
 	"strings"
 
 	"github.com/clipperhouse/jargon"
@@ -27,7 +27,7 @@ func LemmaJargonSample() {
 
 	for i := 0; i < 2; i++ {
 
-		fmt.Printf("%d", i)
+		log.Printf("%d", i)
 		for {
 			token, err := tokens.Next()
 			if err != nil {

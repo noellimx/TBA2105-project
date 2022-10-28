@@ -2,6 +2,7 @@ package storing
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -24,7 +25,7 @@ func DateTwitterToDateDB(dateTwitter string) *time.Time {
 		utils.VFatal(err.Error())
 	}
 
-	fmt.Printf("[DateTwitterToDateDB] %s -> %s\n", dateTwitter, t)
+	log.Printf("[DateTwitterToDateDB] %s <- %s\n", t, dateTwitter)
 
 	return &t
 
@@ -33,7 +34,7 @@ func DateTwitterToDateDB(dateTwitter string) *time.Time {
 func validateTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text string) bool {
 
 	if len(dateStr) != dateStrLength {
-		fmt.Printf("[validateTweetDB] length of dateStr not %d\n", dateStrLength)
+		log.Printf("[validateTweetDB] length of dateStr not %d\n", dateStrLength)
 		return false
 	}
 
@@ -78,5 +79,5 @@ func newTweetDB(idStr string, dateStr string, yyyy string, mm string, dd string,
 func SampleTwitDateToTimeDate() {
 	twitdate := "Sun Oct 23 11:53:11 +0000 2022"
 	some := DateTwitterToDateDB(twitdate)
-	fmt.Printf("\n[SampleTwitDate] %d %d %d %d %d %d", some.Year(), int(some.Month()), some.Day(), some.Hour(), some.Minute(), some.Second())
+	log.Printf("\n[SampleTwitDate] %d %d %d %d %d %d", some.Year(), int(some.Month()), some.Day(), some.Hour(), some.Minute(), some.Second())
 }

@@ -3,6 +3,7 @@ package storing
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 	"github.com/noellimx/TBA2105-project/typings"
@@ -25,14 +26,14 @@ func (dbcn *DBCN_Twitt) createTableTweet() {
 		"retweet_or_fav_count" INT NOT NULL
 	  );`
 
-	fmt.Println("Creating Tweets table...")
+	log.Println("Creating Tweets table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
 	statement.Exec()
 	statement.Close()
-	fmt.Println("Tweets table created")
+	log.Println("Tweets table created")
 
 }
 
@@ -56,7 +57,7 @@ func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string, retweetOrF
 	err := row.Scan(&existingCount)
 
 	if err != nil {
-		fmt.Printf("[AddWordCount] Not found %s [%s]\n", yyyymmddhh, lemma)
+		log.Printf("[AddWordCount] Not found %s [%s]\n", yyyymmddhh, lemma)
 		dbcn.InsertWordCount(yyyymmddhh, lemma)
 	}
 
@@ -79,7 +80,7 @@ func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string, retweetOrF
 }
 
 func (dbcn *DBCN_Twitt) InsertWordCount(yyyymmddhh string, lemma string) {
-	fmt.Printf("[InsertWordCount]\n")
+	log.Printf("[InsertWordCount]\n")
 	query := `INSERT INTO words(yyyymmddhh,word) VALUES (?, ?)`
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
@@ -108,7 +109,7 @@ func (dbcn *DBCN_Twitt) GetTweetsInTheHour(yyyymmddhh string) *[]*PText {
 		var rtFC int
 		rows.Scan(&text, &rtFC)
 
-		fmt.Printf("%s Text: %s Count: %d\n", yyyymmddhh, text, rtFC)
+		log.Printf("%s Text: %s Count: %d\n", yyyymmddhh, text, rtFC)
 
 		ptext := &PText{
 			Text:              text,
@@ -127,32 +128,32 @@ func (dbcn *DBCN_Twitt) CreateTableWords() {
 		"count" INT NOT NULL DEFAULT 0
 	  );`
 
-	fmt.Println("Creating Words table...")
+	log.Println("Creating Words table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
 	statement.Exec()
 	statement.Close()
-	fmt.Println("Words table created if not exist")
+	log.Println("Words table created if not exist")
 }
 
 func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
 
-	fmt.Printf("[InsertTweets] #")
+	log.Printf("[InsertTweets] #")
 
 	for i, t := range tweets {
-		fmt.Printf("%d ", i)
+		log.Printf("%d ", i)
 		dbcn.insertTweet(t)
 	}
 
-	fmt.Println("[InsertTweets] End")
+	log.Println("[InsertTweets] End")
 }
 
 func (dbcn *DBCN_Twitt) insertTweet(tweet *typings.TweetDB) {
 
 	if tweet == nil {
-		fmt.Printf("\n [Insert Tweet] nil tweet. Returning with no-op. \n")
+		log.Printf("\n [Insert Tweet] nil tweet. Returning with no-op. \n")
 		return
 	}
 

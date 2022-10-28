@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -9,6 +8,7 @@ import (
 	"github.com/noellimx/TBA2105-project/collecting"
 	"github.com/noellimx/TBA2105-project/config"
 	"github.com/noellimx/TBA2105-project/storing"
+	"github.com/noellimx/TBA2105-project/typings"
 	"github.com/noellimx/TBA2105-project/utils"
 	"github.com/noellimx/TBA2105-project/wrangling"
 )
@@ -27,8 +27,8 @@ type OptsExtract struct {
 }
 
 func extractProject(mode extractMode, opts *OptsExtract) {
-	fmt.Println("[Extract]")
-	fmt.Printf("Global Config: %+v \n", globalConfig)
+	log.Println("[Extract]")
+	log.Printf("Global Config: %+v \n", globalConfig)
 	cT, err := collecting.GetGlobalClientT(globalConfig)
 	if err != nil {
 		utils.VFatal(err.Error())
@@ -53,73 +53,11 @@ func extractProject(mode extractMode, opts *OptsExtract) {
 			devEnv.RequestCount = opts.RequestCount
 		}
 	default:
-		fmt.Println("[Extract] No recognised instruction for extraction.")
+		log.Println("[Extract] No recognised instruction for extraction.")
 		return
 	}
 	cT.GetAndStore(query, YYYYMMDDFrom, YYYYMMDDTo, devEnv)
 
-}
-
-
-
-var hrsInDay int = 24
-
-func (t *TTime) JumpHour() {
-
-	nextH := (t.Hh + 1)
-	if nextH == hrsInDay {
-		nextH = 0
-		t.jumpDay()
-	}
-	t.Hh = nextH
-}
-
-var daysInYr int = 31
-
-func (t *TTime) jumpDay() {
-
-	nextDay := (t.Dd + 1)
-	if nextDay > daysInYr {
-		nextDay = 1
-		t.jumpMonth()
-	}
-	t.Dd = nextDay
-}
-
-var mmInYr int = 12
-
-func (t *TTime) jumpMonth() {
-
-	nextMth := (t.Mm + 1)
-	if nextMth > mmInYr {
-		nextMth = 1
-		t.jumpYear()
-	}
-	t.Mm = nextMth
-}
-
-func (t *TTime) jumpYear() {
-	t.Yyyy += 1
-}
-
-func (t *TTime) AsString() string {
-	return t.yString() + t.mString() + t.dString() + t.hString()
-}
-
-func (t *TTime) yString() string {
-	return fmt.Sprintf("%04d", t.Yyyy)
-}
-
-func (t *TTime) mString() string {
-	return fmt.Sprintf("%02d", t.Mm)
-}
-
-func (t *TTime) dString() string {
-	return fmt.Sprintf("%02d", t.Dd)
-}
-
-func (t *TTime) hString() string {
-	return fmt.Sprintf("%02d", t.Hh)
 }
 
 func processProject(fn string) {
@@ -128,7 +66,7 @@ func processProject(fn string) {
 
 	dbcn.CreateTableWords()
 
-	tt := NewTTime(2022, 10, 1, 0)
+	tt := typings.NewTTime(2022, 10, 1, 0)
 
 	hours := 24
 	days := 30
@@ -171,6 +109,7 @@ func initLog() {
 }
 func main() {
 
+	initLog()
 	var cmd string
 
 	args := os.Args
@@ -179,7 +118,7 @@ func main() {
 
 	if args_l == 1 {
 
-		fmt.Println("No command specified")
+		log.Println("No command specified")
 		return
 	} else {
 		cmd = os.Args[1]
@@ -193,13 +132,13 @@ func main() {
 	case "extract-prem-some":
 
 		if args_l < 2 {
-			fmt.Println("[Process extract-some-prem] Please specify how many request to send.")
+			log.Println("[Process extract-some-prem] Please specify how many request to send.")
 			return
 		}
 		requestCount, err := strconv.Atoi(args[2])
 
 		if err != nil {
-			fmt.Println("[Process extract-some-prem] Invalid request count specified.")
+			log.Println("[Process extract-some-prem] Invalid request count specified.")
 
 			return
 
@@ -208,12 +147,12 @@ func main() {
 		extractProject(extSOME_Premium, &OptsExtract{RequestCount: requestCount})
 	case "process":
 		if args_l < 2 {
-			fmt.Println("[Process] Please specify existing database")
+			log.Println("[Process] Please specify existing database")
 			return
 		}
 		filename := args[2]
 		processProject(filename)
 	default:
-		fmt.Println("command unrecognized")
+		log.Println("command unrecognized")
 	}
 }
