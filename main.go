@@ -136,6 +136,9 @@ func main() {
 		log.Printf("%t %d %d", (args_l < 2), args_l, 2)
 		dbfilename := args[2]
 		processProject(dbfilename)
+
+	case "sampletime":
+		storing.SampleTwitDateToTimeDate()
 	default:
 		log.Printf("command [%s] unrecognized", cmd)
 	}
