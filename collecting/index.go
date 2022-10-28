@@ -103,15 +103,13 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
-	log.Println(req.URL.RawQuery)
+	log.Printf("[cT.twitterSearch1_1] Raw Query : %s \n", req.URL.RawQuery)
 
 	// 3. Execute Request
 
-	log.Printf("[cT.twitterSearch1_1] Attempt to do client req: %p \n", &req)
+	log.Printf("[cT.twitterSearch1_1] Attempt to do client req. ptr to req: %p \n", &req)
 
 	resp, err := ct.c.Do(req)
-	log.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-reset")])
-	log.Printf("remaining %s\n", resp.Header[http.CanonicalHeaderKey("x-rate-limit-remaining")])
 	if err != nil {
 
 		log.Println("[cT.twitterSearch1_1] Do client request error")
@@ -128,8 +126,8 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	if statusCode != 200 {
 		utils.VFatal(string(body))
 	}
-	writeBodyToPath := fmt.Sprintf("twitterSearch1_1-%s-%s-%s.json", postBodyMap["fromDate"], postBodyMap["toDate"], next)
-	f, err := os.Create(writeBodyToPath)
+	writeDataJSONPath := fmt.Sprintf("twitterSearch1_1-%s-%s-%s.json", postBodyMap["fromDate"], postBodyMap["toDate"], next)
+	f, err := os.Create(writeDataJSONPath)
 
 	if err != nil {
 		utils.VFatal(err.Error())
@@ -140,7 +138,7 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	bodyJSON := &SelectedMarshalledResponse{}
 	json.Unmarshal(body, bodyJSON)
 	bodyJSON.RequestParameters.Query = postBodyMap["query"]
-	log.Printf("Writing to : %s", writeBodyToPath)
+	log.Printf("Needful Data JSON-Writing to: %s\n", writeDataJSONPath)
 
 	var tweetDBs []*typings.TweetDB
 	for idx, result := range bodyJSON.Results {
@@ -155,28 +153,25 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	return bodyJSON.Next, tweetDBs
 }
 
-func (cT *ClientTWit) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
-
-	_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", NonPremium30Day)
-
-	dbcn.InsertTweets(tweetDBs)
-
-}
-
 func (cT *ClientTWit) GetAndStore(query string, yyyymmddFrom string, yyyymmddTo string, devEnv *DevEnv) {
+	log.Printf("[GetAndStore] ---------------- \n")
+
+	var total int = devEnv.RequestCount
+
+	var requestCount int = devEnv.RequestCount
 
 	var infinite bool = false
 	next := ""
 
-	if devEnv.RequestCount == -1 {
+	if requestCount == -1 {
 		infinite = true
-		log.Printf("[GetAndStore] [%d](Infinite request cycles) \n", devEnv.RequestCount)
+		log.Printf("[GetAndStore] [%d](Infinite request cycles) \n", requestCount)
 	}
 
-	log.Printf("[GetAndStore] %s\n", devEnv.Env)
+	log.Printf("[GetAndStore] Environment: %s Request Count: %d Endpoint: %s \n", devEnv.Env, devEnv.RequestCount, devEnv.Endpoint)
 
-	for infinite || devEnv.RequestCount > 0 {
-		log.Printf("[GetAndStore] RemainingRequest[%d] Searching in 2 secs... \n", devEnv.RequestCount)
+	for infinite || requestCount > 0 {
+		log.Printf("[GetAndStore] RemainingRequest[%d/%d] Searching in 2 secs... \n", requestCount, total)
 		time.Sleep(2 * time.Second)
 		next_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, devEnv)
 		next = next_

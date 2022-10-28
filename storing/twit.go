@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 	"github.com/noellimx/TBA2105-project/typings"
@@ -142,10 +143,14 @@ func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
 
 	log.Printf("[InsertTweets] #")
 
+	var indexes_log strings.Builder
+
 	for i, t := range tweets {
-		log.Printf("%d ", i)
+		indexes_log.Write([]byte(fmt.Sprintf("%d ", i)))
 		dbcn.insertTweet(t)
 	}
+
+	log.Printf("[InsertTweets] %s", indexes_log.String())
 
 	log.Println("[InsertTweets] End")
 }
@@ -162,6 +167,9 @@ func (dbcn *DBCN_Twitt) insertTweet(tweet *typings.TweetDB) {
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
+
+	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", tweet.Yyyymmddhh, tweet.IdStr)
+
 	_, err = statement.Exec(tweet.IdStr, tweet.Yyyymmddhh, tweet.Yyyy, tweet.Mm, tweet.Dd, tweet.Hh, tweet.Text, tweet.RetweetOrFavCount)
 	if err != nil {
 		utils.VFatal(err.Error())

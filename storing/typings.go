@@ -17,15 +17,12 @@ var dateStrLength int = 10
 
 func DateTwitterToDateDB(dateTwitter string) *time.Time {
 
-	// "Sun Oct 23 11:53:11 +0000 2022"
 	strings.Split(dateTwitter, " ")
 	t, err := timefmt.Parse(dateTwitter, "%a %b %d %H:%M:%S +0000 %Y")
 
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
-
-	log.Printf("[DateTwitterToDateDB] %s <- %s\n", t, dateTwitter)
 
 	return &t
 
@@ -44,6 +41,8 @@ func ResulttoTweetDB(c *typings.ResponseResults) *typings.TweetDB {
 
 	idStr := c.IdStr
 	t := DateTwitterToDateDB(c.CreatedAt)
+
+	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", t, c.IdStr)
 
 	yyyy := fmt.Sprintf("%04d", t.Year())
 	mm := fmt.Sprintf("%02d", int(t.Month()))

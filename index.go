@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -26,39 +27,7 @@ type OptsExtract struct {
 	RequestCount int
 }
 
-func extractProject(mode extractMode, opts *OptsExtract) {
-	log.Println("[Extract]")
-	log.Printf("Global Config: %+v \n", globalConfig)
-	cT, err := collecting.GetGlobalClientT(globalConfig)
-	if err != nil {
-		utils.VFatal(err.Error())
-	}
-	cT.Dbcn = storing.InitTwitDB(true)
 
-	var devEnv *collecting.DevEnv = nil
-
-	switch mode {
-	case extFIRST:
-		devEnv = collecting.NonPremium30Day
-		devEnv.RequestCount = 1
-	case extTWO:
-		devEnv = collecting.NonPremium30Day
-		devEnv.RequestCount = 2
-	case extALL_Premium:
-		devEnv = collecting.PremiumFullArchive
-		devEnv.RequestCount = -1
-	case extSOME_Premium:
-		devEnv = collecting.PremiumFullArchive
-		if opts != nil {
-			devEnv.RequestCount = opts.RequestCount
-		}
-	default:
-		log.Println("[Extract] No recognised instruction for extraction.")
-		return
-	}
-	cT.GetAndStore(query, YYYYMMDDFrom, YYYYMMDDTo, devEnv)
-
-}
 
 func processProject(fn string) {
 
@@ -96,9 +65,9 @@ const (
 	extSOME_Premium extractMode = 4
 )
 
-func initLog() {
+func initLog(postpent string) {
 
-	file, err := os.OpenFile("log-", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	file, err := os.OpenFile(fmt.Sprintf("log-%s.txt", postpent), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,13 +78,12 @@ func initLog() {
 }
 func main() {
 
-	initLog()
 	var cmd string
 
 	args := os.Args
 
 	args_l := len(args)
-
+	log.Println("---------main---------")
 	if args_l == 1 {
 
 		log.Println("No command specified")
@@ -123,6 +91,9 @@ func main() {
 	} else {
 		cmd = os.Args[1]
 	}
+
+	fmt.Println()
+	initLog(cmd)
 
 	switch cmd {
 	case "extract-first":
