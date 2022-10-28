@@ -112,13 +112,10 @@ func main() {
 	case "extract-two":
 		extractProject(extTWO, nil)
 	case "extract-prem-some":
-
 		defaultRequestCount := 1
 		var requestCount int = defaultRequestCount
 		if args_l == 2 {
-			if args_l < 2 {
-				log.Printf("[main:extract-some-prem] Request Count Defaulted to %d. \n", requestCount)
-			}
+			log.Printf("[main:extract-some-prem] Request Count Defaulted to %d. \n", requestCount)
 		} else {
 			requestCount_, err := strconv.Atoi(args[2])
 			requestCount = requestCount_
@@ -128,6 +125,9 @@ func main() {
 			}
 		}
 		extractProject(extSOME_Premium, &OptsExtract{RequestCount: requestCount})
+
+	case "extract-prem-all":
+		extractProject(extALL_Premium, nil)
 	case "process":
 		if args_l < 3 {
 			log.Println("[main:process] Please specify existing database")
