@@ -15,11 +15,12 @@ var dateStrLength int = 10
 
 // %a %b %d %H:%M:%S +0000 %Y
 
+var STD_TWITTER_UTC_STRING_PARSE string = "%a %b %d %H:%M:%S +0000 %Y"
+
 func DateTwitterToDateDB(dateTwitter string) *time.Time {
 
 	strings.Split(dateTwitter, " ")
-	t, err := timefmt.Parse(dateTwitter, "%a %b %d %H:%M:%S +0000 %Y")
-
+	t, err := timefmt.Parse(dateTwitter, STD_TWITTER_UTC_STRING_PARSE)
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
@@ -43,14 +44,14 @@ var LOCSGTIME, _ = time.LoadLocation("Singapore")
 func ResulttoTweetDB(c *typings.ResponseResults) *typings.TweetDB {
 
 	idStr := c.IdStr
-	t := DateTwitterToDateDB(c.CreatedAt).In(LOCSGTIME)
+	createdAt_Time := DateTwitterToDateDB(c.CreatedAt).In(LOCSGTIME)
+	c.CreatedAt = timefmt.Format(createdAt_Time.In(LOCSGTIME), STD_TWITTER_UTC_STRING_PARSE)
+	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", createdAt_Time, c.IdStr)
 
-	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", t, c.IdStr)
-
-	yyyy := fmt.Sprintf("%04d", t.Year())
-	mm := fmt.Sprintf("%02d", int(t.Month()))
-	dd := fmt.Sprintf("%02d", t.Day())
-	hh := fmt.Sprintf("%02d", t.Hour())
+	yyyy := fmt.Sprintf("%04d", createdAt_Time.Year())
+	mm := fmt.Sprintf("%02d", int(createdAt_Time.Month()))
+	dd := fmt.Sprintf("%02d", createdAt_Time.Day())
+	hh := fmt.Sprintf("%02d", createdAt_Time.Hour())
 
 	text := c.Text
 
@@ -83,9 +84,9 @@ func SampleTwitDateToTimeDate() {
 	some := DateTwitterToDateDB(twitdate)
 	log.Printf("\n[SampleTwitDate] %s \n", twitdate)
 	log.Printf("\n[SampleTwitDate] %d %d %d %d %d %d\n", some.Year(), int(some.Month()), some.Day(), some.Hour(), some.Minute(), some.Second())
-	fmt.Printf("ori: %s -> local: %s \n", some, some.Local())
+	log.Printf("ori: %s -> local: %s \n", some, some.Local())
 
 	locsg, _ := time.LoadLocation("Singapore")
 	log.Printf("ori: %s -> local Local()s: %s \n", some, some.Local())
-	log.Printf("ori: %s -> local In: %s \n", some, some.In(locsg))
+	log.Printf("ori: %s -> local In: %s \n", some, timefmt.Format(some.In(locsg), STD_TWITTER_UTC_STRING_PARSE))
 }
