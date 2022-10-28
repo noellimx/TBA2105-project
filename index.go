@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -59,25 +60,11 @@ func extractProject(mode extractMode, opts *OptsExtract) {
 
 }
 
-type tTime struct {
-	Yyyy int
-	Dd   int
-	Mm   int
-	Hh   int
-}
 
-func newTTime(y, m, d, h int) *tTime {
-	return &tTime{
-		Yyyy: y,
-		Dd:   d,
-		Mm:   m,
-		Hh:   h,
-	}
-}
 
 var hrsInDay int = 24
 
-func (t *tTime) JumpHour() {
+func (t *TTime) JumpHour() {
 
 	nextH := (t.Hh + 1)
 	if nextH == hrsInDay {
@@ -89,7 +76,7 @@ func (t *tTime) JumpHour() {
 
 var daysInYr int = 31
 
-func (t *tTime) jumpDay() {
+func (t *TTime) jumpDay() {
 
 	nextDay := (t.Dd + 1)
 	if nextDay > daysInYr {
@@ -101,7 +88,7 @@ func (t *tTime) jumpDay() {
 
 var mmInYr int = 12
 
-func (t *tTime) jumpMonth() {
+func (t *TTime) jumpMonth() {
 
 	nextMth := (t.Mm + 1)
 	if nextMth > mmInYr {
@@ -111,27 +98,27 @@ func (t *tTime) jumpMonth() {
 	t.Mm = nextMth
 }
 
-func (t *tTime) jumpYear() {
+func (t *TTime) jumpYear() {
 	t.Yyyy += 1
 }
 
-func (t *tTime) AsString() string {
+func (t *TTime) AsString() string {
 	return t.yString() + t.mString() + t.dString() + t.hString()
 }
 
-func (t *tTime) yString() string {
+func (t *TTime) yString() string {
 	return fmt.Sprintf("%04d", t.Yyyy)
 }
 
-func (t *tTime) mString() string {
+func (t *TTime) mString() string {
 	return fmt.Sprintf("%02d", t.Mm)
 }
 
-func (t *tTime) dString() string {
+func (t *TTime) dString() string {
 	return fmt.Sprintf("%02d", t.Dd)
 }
 
-func (t *tTime) hString() string {
+func (t *TTime) hString() string {
 	return fmt.Sprintf("%02d", t.Hh)
 }
 
@@ -141,7 +128,7 @@ func processProject(fn string) {
 
 	dbcn.CreateTableWords()
 
-	tt := newTTime(2022, 10, 1, 0)
+	tt := NewTTime(2022, 10, 1, 0)
 
 	hours := 24
 	days := 30
@@ -171,6 +158,17 @@ const (
 	extSOME_Premium extractMode = 4
 )
 
+func initLog() {
+
+	file, err := os.OpenFile("log-", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.SetOutput(file)
+
+	log.Println("Hello world!")
+}
 func main() {
 
 	var cmd string
