@@ -21,7 +21,6 @@ func DateTwitterToDateDB(dateTwitter string) *time.Time {
 	t, err := timefmt.Parse(dateTwitter, "%a %b %d %H:%M:%S +0000 %Y")
 
 	if err != nil {
-
 		utils.VFatal(err.Error())
 	}
 
@@ -54,13 +53,8 @@ func ResulttoTweetDB(c *typings.ResponseResults) *typings.TweetDB {
 
 	dateStr := fmt.Sprintf("%s%s%s%s", yyyy, mm, dd, hh)
 
-	fmt.Printf("[ResulttoTweetDB]text %s\n", text)
-	fmt.Printf("[ResulttoTweetDB]dateStr %s\n", dateStr)
-
-	// return newTweetDB(c.IdStr, )
 	retweetOrFavCount := c.FavoriteCount + c.RetweetCount
 	return newTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text, retweetOrFavCount)
-
 }
 func newTweetDB(idStr string, dateStr string, yyyy string, mm string, dd string, hh string, text string, rtFC int) *typings.TweetDB {
 

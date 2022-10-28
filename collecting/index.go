@@ -16,38 +16,57 @@ import (
 	"github.com/noellimx/TBA2105-project/utils"
 )
 
+type DevEnv struct {
+	RequestCount         int
+	MaxResultsPerRequest int
+	Env                  string
+	Endpoint             string
+}
+
+var NonPremium30Day *DevEnv = &DevEnv{
+	MaxResultsPerRequest: 100,
+	Env:                  "env2",
+	Endpoint:             "30day",
+}
+
+var PremiumFullArchive *DevEnv = &DevEnv{
+	MaxResultsPerRequest: 500,
+	Env:                  "env1",
+	Endpoint:             "fullarchive",
+}
 var httpMethods = &struct {
 	post string
 	get  string
 }{post: "POST", get: "GEt"}
 
-type ClientT struct {
-	c *http.Client
-
+type ClientTWit struct {
+	c            *http.Client
+	Dbcn         *storing.DBCN_Twitt
 	globalConfig *config.GlobalConfig
 }
 
 var haveClient = false
 
-var globalClient *ClientT
+var globalClient *ClientTWit
 
-const (
-	searchMode_30Days = "30day"
-	searchMode_Full   = "fullarchive"
-)
-
-func GetGlobalClientT(globalConfig *config.GlobalConfig) (*ClientT, error) {
+func GetGlobalClientT(globalConfig *config.GlobalConfig) (*ClientTWit, error) {
 	if haveClient {
 
 		return nil, errors.New("math: square root of negative number")
 	}
 
 	haveClient = true
-	globalClient = &ClientT{c: &http.Client{}, globalConfig: globalConfig}
+	globalClient = &ClientTWit{c: &http.Client{}, globalConfig: globalConfig}
 	return globalClient, nil
 }
 
-func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd string, next string, maxResults int, env string, mode string) (string, []*typings.TweetDB) {
+// next is the current
+func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd_e string, next string, devEnv *DevEnv) (nextnext string, tweets []*typings.TweetDB) {
+
+	// maxResults int, env string, mode string
+	maxResults := devEnv.MaxResultsPerRequest
+	env := devEnv.Env
+	endpoint := devEnv.Endpoint
 
 	fn_name := "[cT.twitterSearch1_1]"
 	fmt.Println(fn_name)
@@ -59,8 +78,8 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	postBodyMap := make(map[string]string)
 
 	postBodyMap["query"] = query
-	postBodyMap["fromDate"] = fmt.Sprintf("%s%s", s_yyyymmdd, hhmmStart)
-	postBodyMap["toDate"] = fmt.Sprintf("%s%s", e_yyyymmdd, hhmmEnd)
+	postBodyMap["fromDate"] = fmt.Sprintf("%s%s", yyyymmdd_s, hhmmStart)
+	postBodyMap["toDate"] = fmt.Sprintf("%s%s", yyyymmdd_e, hhmmEnd)
 	postBodyMap["maxResults"] = fmt.Sprintf("%d", maxResults)
 
 	if next != "" {
@@ -70,7 +89,7 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 	responseBody := bytes.NewBuffer(postBody)
 
 	// 2. Form HTTPS Request
-	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/%s/%s.json", mode, env)
+	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/%s/%s.json", endpoint, env)
 
 	fmt.Println(url)
 	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
@@ -131,52 +150,50 @@ func (ct *ClientT) twitterSearch1_1(query string, s_yyyymmdd string, e_yyyymmdd 
 		}
 	}
 	data, _ := json.Marshal(bodyJSON)
-
 	f.Write(data)
 	return bodyJSON.Next, tweetDBs
 }
 
-var nonPremiumEnv string = "env2"
+func (cT *ClientTWit) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
 
-func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
-
-	_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv, searchMode_30Days)
+	_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", NonPremium30Day)
 
 	dbcn.InsertTweets(tweetDBs)
 
 }
 
-func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_TwoResult(query string, yyyymmddFrom string, yyyymmddTo string, dbcn *storing.DBCN_Twitt) {
+func (cT *ClientTWit) GetAndStore(query string, yyyymmddFrom string, yyyymmddTo string, devEnv *DevEnv) {
 
-	next, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, "", 100, nonPremiumEnv, searchMode_30Days)
-
-	dbcn.InsertTweets(tweetDBs)
-
-	if next != "" {
-		_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, nonPremiumEnv, searchMode_30Days)
-		dbcn.InsertTweets(tweetDBs)
-	}
-}
-
-func (cT *ClientT) GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query string, yyyymmddFrom string, yyyymmddTo string) {
+	var infinite bool = false
 	next := ""
-	for {
-		fmt.Printf("[GetNonPREMIUM30DaysForCustomDateLocationSG_AllResult] Searching in 2 secs... \n")
+
+	if devEnv.RequestCount == -1 {
+		infinite = true
+		fmt.Printf("[GetAndStore] [%d](Infinite request cycles) \n", devEnv.RequestCount)
+	}
+
+	fmt.Printf("[GetAndStore] %s\n", devEnv.Env)
+
+	for infinite || devEnv.RequestCount > 0 {
+		fmt.Printf("[GetAndStore] RemainingRequest[%d] Searching in 2 secs... \n", devEnv.RequestCount)
 		time.Sleep(2 * time.Second)
-		next, _ = cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, 100, nonPremiumEnv, searchMode_30Days)
+		next_, tweetDBs := cT.twitterSearch1_1(query, yyyymmddFrom, yyyymmddTo, next, devEnv)
+		next = next_
+		cT.Dbcn.InsertTweets(tweetDBs)
 
-		fmt.Printf("next: [%s]\n", next)
+		fmt.Printf("next: [%s]\n", next_)
 
-		if next == "" {
+		if next_ == "" {
 			break
 		}
-		print("looping \n")
+
+		devEnv.RequestCount--
 	}
 }
 
-func (cT *ClientT) demos() {
+func (cT *ClientTWit) demos() {
 
 }
-func (cT *ClientT) Demos() {
+func (cT *ClientTWit) Demos() {
 	cT.demos()
 }

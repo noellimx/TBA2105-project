@@ -138,21 +138,23 @@ func (dbcn *DBCN_Twitt) CreateTableWords() {
 }
 
 func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
+
+	fmt.Printf("[InsertTweets] #")
+
 	for i, t := range tweets {
-		fmt.Printf("[InsertTweets] @index %d \n", i)
-		dbcn.InsertTweet(t)
+		fmt.Printf("%d ", i)
+		dbcn.insertTweet(t)
 	}
+
 	fmt.Println("[InsertTweets] End")
 }
 
-func (dbcn *DBCN_Twitt) InsertTweet(tweet *typings.TweetDB) {
+func (dbcn *DBCN_Twitt) insertTweet(tweet *typings.TweetDB) {
 
 	if tweet == nil {
-		fmt.Printf("[Insert Tweet] nil tweet. Returning with no-op. \n")
+		fmt.Printf("\n [Insert Tweet] nil tweet. Returning with no-op. \n")
 		return
 	}
-
-	fmt.Printf("[Insert Tweet] Inserting tweet record ... \n")
 
 	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	statement, err := dbcn.db.Prepare(query)

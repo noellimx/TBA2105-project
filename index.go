@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/noellimx/TBA2105-project/collecting"
 	"github.com/noellimx/TBA2105-project/config"
@@ -20,24 +21,41 @@ var YYYYMMDDTo string = "20221025"
 
 var query string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 25mi]"
 
-func extractProject(mode extractMode) {
+type OptsExtract struct {
+	RequestCount int
+}
+
+func extractProject(mode extractMode, opts *OptsExtract) {
 	fmt.Println("[Extract]")
 	fmt.Printf("Global Config: %+v \n", globalConfig)
 	cT, err := collecting.GetGlobalClientT(globalConfig)
 	if err != nil {
-
 		utils.VFatal(err.Error())
 	}
-	dbcn := storing.InitTwitDB(true)
+	cT.Dbcn = storing.InitTwitDB(true)
+
+	var devEnv *collecting.DevEnv = nil
 
 	switch mode {
 	case extFIRST:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_FirstResult(query, YYYYMMDDFrom, YYYYMMDDTo, dbcn)
+		devEnv = collecting.NonPremium30Day
+		devEnv.RequestCount = 1
 	case extTWO:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_TwoResult(query, YYYYMMDDFrom, YYYYMMDDTo, dbcn)
-	case extALL:
-		cT.GetAndStoreNonPREMIUM30DaysForCustomDateLocationSG_AllResult(query, YYYYMMDDFrom, YYYYMMDDTo)
+		devEnv = collecting.NonPremium30Day
+		devEnv.RequestCount = 2
+	case extALL_Premium:
+		devEnv = collecting.PremiumFullArchive
+		devEnv.RequestCount = -1
+	case extSOME_Premium:
+		devEnv = collecting.PremiumFullArchive
+		if opts != nil {
+			devEnv.RequestCount = opts.RequestCount
+		}
+	default:
+		fmt.Println("[Extract] No recognised instruction for extraction.")
+		return
 	}
+	cT.GetAndStore(query, YYYYMMDDFrom, YYYYMMDDTo, devEnv)
 
 }
 
@@ -147,9 +165,10 @@ func processProject(fn string) {
 type extractMode int
 
 const (
-	extFIRST extractMode = 1
-	extTWO   extractMode = 2
-	extALL   extractMode = 3
+	extFIRST        extractMode = 1
+	extTWO          extractMode = 2
+	extALL_Premium  extractMode = 3
+	extSOME_Premium extractMode = 4
 )
 
 func main() {
@@ -170,12 +189,29 @@ func main() {
 
 	switch cmd {
 	case "extract-first":
-		extractProject(extFIRST)
+		extractProject(extFIRST, nil)
 	case "extract-two":
-		extractProject(extTWO)
+		extractProject(extTWO, nil)
+	case "extract-prem-some":
+
+		if args_l < 2 {
+			fmt.Println("[Process extract-some-prem] Please specify how many request to send.")
+			return
+		}
+		requestCount, err := strconv.Atoi(args[2])
+
+		if err != nil {
+			fmt.Println("[Process extract-some-prem] Invalid request count specified.")
+
+			return
+
+		}
+
+		extractProject(extSOME_Premium, &OptsExtract{RequestCount: requestCount})
 	case "process":
 		if args_l < 2 {
 			fmt.Println("[Process] Please specify existing database")
+			return
 		}
 		filename := args[2]
 		processProject(filename)
