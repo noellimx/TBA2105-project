@@ -10,7 +10,6 @@ import (
 	"github.com/noellimx/TBA2105-project/utils"
 )
 
-var sampleDbFileName string = "sample.db"
 
 type DBCN_Sample struct {
 	db *sql.DB
@@ -70,19 +69,18 @@ func newDBCN(dbFileName string) *DBCN_Sample {
 
 	os.Remove(dbFileName) // I delete the file to avoid duplicated records.
 
-	log.Println("Creating db...")
+	log.Println("[newDBCN]Creating db...")
 	file, err := os.Create(dbFileName) // Create SQLite file
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
-	log.Printf("Database [%s] created", dbFileName)
+	log.Printf("[newDBCN]Database [%s] created", dbFileName)
 	file.Close()
 
-	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", dbFileName))
+	sqliteDatabase, _ := sql.Open(DbDriver, fmt.Sprintf("./%s", dbFileName))
 	defer sqliteDatabase.Close() // Defer Closing the database
 
 	return &DBCN_Sample{
-
 		db: sqliteDatabase,
 	}
 }

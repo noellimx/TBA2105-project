@@ -11,7 +11,7 @@ func overwriteFilePath(filename string) {
 
 	os.Remove(filename) // I delete the file to avoid duplicated records.
 
-	log.Println("Creating db...")
+	log.Println("[overwriteFilePath] Creating file... This is an overwrite operation.")
 	file, err := os.Create(filename) // Create SQLite file
 	if err != nil {
 		utils.VFatal(err.Error())

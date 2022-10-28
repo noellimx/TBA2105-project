@@ -141,7 +141,7 @@ func (dbcn *DBCN_Twitt) CreateTableWords() {
 
 func (dbcn *DBCN_Twitt) InsertTweets(tweets []*typings.TweetDB) {
 
-	log.Printf("[InsertTweets] #")
+	log.Printf("[InsertTweets] Inserting.... See below for logs.")
 
 	var indexes_log strings.Builder
 
@@ -182,16 +182,16 @@ func NewDBCN_Twitt(dbFileName string, overwrite bool) *DBCN_Twitt {
 		overwriteFilePath(dbFileName)
 	}
 
-	sqliteDatabase, _ := sql.Open("sqlite3", fmt.Sprintf("./%s", dbFileName))
+	sqliteDatabase, _ := sql.Open(DbDriver, fmt.Sprintf("./%s", dbFileName))
 
 	return &DBCN_Twitt{
 		db: sqliteDatabase,
 	}
 }
-func InitTwitDB(overwrite bool) *DBCN_Twitt {
+func InitTwitDB(overwrite bool, dbName string) *DBCN_Twitt {
 	// SQLite is a file based database.
 
-	dbcn := NewDBCN_Twitt(TwitDbFileName, true)
+	dbcn := NewDBCN_Twitt(dbName, true)
 	dbcn.createTableTweet() // Create Database Tables
 
 	return dbcn

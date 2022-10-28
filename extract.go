@@ -8,6 +8,10 @@ import (
 	"github.com/noellimx/TBA2105-project/utils"
 )
 
+type OptsExtract struct {
+	RequestCount int
+}
+
 func extractProject(mode extractMode, opts *OptsExtract) {
 	log.Println("[Extract] --------------------------------------------------------------------------------------------------------------------------------")
 	log.Printf("Global Config: %+v \n", globalConfig)
@@ -15,7 +19,7 @@ func extractProject(mode extractMode, opts *OptsExtract) {
 	if err != nil {
 		utils.VFatal(err.Error())
 	}
-	cT.Dbcn = storing.InitTwitDB(true)
+	cT.Dbcn = storing.InitTwitDB(true, globalConfig.DB.DBFileName)
 
 	var devEnv *collecting.DevEnv = nil
 

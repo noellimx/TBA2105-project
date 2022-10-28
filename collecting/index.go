@@ -99,7 +99,7 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
 	req.Header.Add("Content-Type", "application/json")
 
-	log.Printf("[cT.twitterSearch1_1] Query: %s \n", query)
+	log.Printf("[cT.twitterSearch1_1] Query: \"%s\" \n", query)
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
@@ -126,7 +126,7 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 	if statusCode != 200 {
 		utils.VFatal(string(body))
 	}
-	writeDataJSONPath := fmt.Sprintf("twitterSearch1_1-%s-%s-%s.json", postBodyMap["fromDate"], postBodyMap["toDate"], next)
+	writeDataJSONPath := fmt.Sprintf("./data/twitterSearch1_1-%s-%s-%s.json", postBodyMap["fromDate"], postBodyMap["toDate"], next)
 	f, err := os.Create(writeDataJSONPath)
 
 	if err != nil {

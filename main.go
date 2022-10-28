@@ -6,11 +6,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/noellimx/TBA2105-project/collecting"
 	"github.com/noellimx/TBA2105-project/config"
 	"github.com/noellimx/TBA2105-project/storing"
 	"github.com/noellimx/TBA2105-project/typings"
-	"github.com/noellimx/TBA2105-project/utils"
 	"github.com/noellimx/TBA2105-project/wrangling"
 )
 
@@ -21,16 +19,13 @@ var globalConfig = config.ReadConfig(CONFIG_PATH)
 var YYYYMMDDFrom string = "20221001"
 var YYYYMMDDTo string = "20221025"
 
-var query string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 25mi]"
+var query1 string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 25mi]"
+var queryWithoutGeo string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs"
 
-type OptsExtract struct {
-	RequestCount int
-}
-
-
+var query string = queryWithoutGeo
 
 func processProject(fn string) {
-
+	fmt.Printf("[processProject] \n")
 	dbcn := storing.NewDBCN_Twitt(fn, false)
 
 	dbcn.CreateTableWords()
@@ -67,7 +62,7 @@ const (
 
 func initLog(postpent string) {
 
-	file, err := os.OpenFile(fmt.Sprintf("log-%s.txt", postpent), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	file, err := os.OpenFile(fmt.Sprintf("./data/log-%s.txt", postpent), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,6 +71,13 @@ func initLog(postpent string) {
 
 	log.Println("Hello world!")
 }
+
+func logPad() {
+	log.Println()
+	log.Println()
+	log.Println()
+
+}
 func main() {
 
 	var cmd string
@@ -83,17 +85,26 @@ func main() {
 	args := os.Args
 
 	args_l := len(args)
-	log.Println("---------main---------")
-	if args_l == 1 {
 
+	for i, ar := range args {
+
+		fmt.Printf("args [%d] %s\n", i, ar)
+
+	}
+
+	if args_l == 1 {
 		log.Println("No command specified")
 		return
 	} else {
-		cmd = os.Args[1]
+		cmd = args[1]
 	}
 
-	fmt.Println()
 	initLog(cmd)
+
+	logPad()
+	log.Println("---------main---------")
+
+	log.Printf("command: %s\n", cmd)
 
 	switch cmd {
 	case "extract-first":
@@ -102,28 +113,32 @@ func main() {
 		extractProject(extTWO, nil)
 	case "extract-prem-some":
 
-		if args_l < 2 {
-			log.Println("[Process extract-some-prem] Please specify how many request to send.")
-			return
+		defaultRequestCount := 1
+		var requestCount int = defaultRequestCount
+		if args_l == 2 {
+			if args_l < 2 {
+				log.Printf("[main:extract-some-prem] Request Count Defaulted to %d. \n", requestCount)
+			}
+		} else {
+			requestCount_, err := strconv.Atoi(args[2])
+			requestCount = requestCount_
+			if err != nil {
+				log.Println("[main:extract-some-prem] Invalid request count specified.")
+				return
+			}
 		}
-		requestCount, err := strconv.Atoi(args[2])
-
-		if err != nil {
-			log.Println("[Process extract-some-prem] Invalid request count specified.")
-
-			return
-
-		}
-
 		extractProject(extSOME_Premium, &OptsExtract{RequestCount: requestCount})
 	case "process":
-		if args_l < 2 {
-			log.Println("[Process] Please specify existing database")
-			return
+		if args_l < 3 {
+			log.Println("[main:process] Please specify existing database")
+			break
 		}
-		filename := args[2]
-		processProject(filename)
+		log.Printf("%t %d %d", (args_l < 2), args_l, 2)
+		dbfilename := args[2]
+		processProject(dbfilename)
 	default:
-		log.Println("command unrecognized")
+		log.Printf("command [%s] unrecognized", cmd)
 	}
+
+	fmt.Println("end.main.end")
 }
