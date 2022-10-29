@@ -146,11 +146,11 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 		// Get the full text
 		if result.ExtendedTweet.FullText != "" {
 			bodyJSON.Results[idx].Text = result.ExtendedTweet.FullText
-			twDB := storing.ResulttoTweetDB(bodyJSON.Results[idx])
+			twDB := storing.ResulttoTweetDBAndTimeConversion(bodyJSON.Results[idx])
 			tweetDBs = append(tweetDBs, twDB)
 		} else if result.RetweetedStatus.ExtendedTweet.FullText != "" {
 			bodyJSON.Results[idx].Text = result.RetweetedStatus.ExtendedTweet.FullText
-			twDB := storing.ResulttoTweetDB(bodyJSON.Results[idx])
+			twDB := storing.ResulttoTweetDBAndTimeConversion(bodyJSON.Results[idx])
 			tweetDBs = append(tweetDBs, twDB)
 		}
 	}
@@ -191,6 +191,9 @@ func (cT *ClientTWit) GetAndStore(query string, yyyymmddFrom string, yyyymmddTo 
 
 		requestCount--
 	}
+
+	log.Printf("[GetAndStore] -----END----------- \n")
+
 }
 
 func (cT *ClientTWit) demos() {

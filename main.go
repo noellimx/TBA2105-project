@@ -16,8 +16,8 @@ var CONFIG_PATH string = "./config.json"
 
 var globalConfig = config.ReadConfig(CONFIG_PATH)
 
-var YYYYMMDDFrom string = "20221001"
-var YYYYMMDDTo string = "20221025"
+var YYYYMMDDFrom string = "20220101"
+var YYYYMMDDTo string = "20220731"
 
 var query1 string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 25mi]"
 var queryWithoutGeo string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs"
@@ -136,7 +136,6 @@ func main() {
 		log.Printf("%t %d %d", (args_l < 2), args_l, 2)
 		dbfilename := args[2]
 		processProject(dbfilename)
-
 	case "sampletime":
 		storing.SampleTwitDateToTimeDate()
 	default:
@@ -144,4 +143,6 @@ func main() {
 	}
 
 	fmt.Println("end.main.end")
+	log.Println("----end.main.end---")
+	log.Println()
 }

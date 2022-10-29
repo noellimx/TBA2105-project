@@ -41,21 +41,16 @@ func validateTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text string) bool {
 
 var LOCSGTIME, _ = time.LoadLocation("Singapore")
 
-func ResulttoTweetDB(c *typings.ResponseResults) *typings.TweetDB {
+func ResulttoTweetDBAndTimeConversion(c *typings.ResponseResults) *typings.TweetDB {
 
 	idStr := c.IdStr
-	createdAt_Time := DateTwitterToDateDB(c.CreatedAt).In(LOCSGTIME)
-	c.CreatedAt = timefmt.Format(createdAt_Time.In(LOCSGTIME), STD_TWITTER_UTC_STRING_PARSE)
-	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", createdAt_Time, c.IdStr)
+	createdAtLocal_Time := DateTwitterToDateDB(c.CreatedAt).In(LOCSGTIME)
+	c.CreatedAt = timefmt.Format(createdAtLocal_Time.In(LOCSGTIME), STD_TWITTER_UTC_STRING_PARSE)
+	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", createdAtLocal_Time, c.IdStr)
 
-	yyyy := fmt.Sprintf("%04d", createdAt_Time.Year())
-	mm := fmt.Sprintf("%02d", int(createdAt_Time.Month()))
-	dd := fmt.Sprintf("%02d", createdAt_Time.Day())
-	hh := fmt.Sprintf("%02d", createdAt_Time.Hour())
+	yyyy, mm, dd, hh, dateStr := utils.GoTimeToYYYYMMDD(&createdAtLocal_Time)
 
 	text := c.Text
-
-	dateStr := fmt.Sprintf("%s%s%s%s", yyyy, mm, dd, hh)
 
 	retweetOrFavCount := c.FavoriteCount + c.RetweetCount
 	return newTweetDB(idStr, dateStr, yyyy, mm, dd, hh, text, retweetOrFavCount)
@@ -89,4 +84,13 @@ func SampleTwitDateToTimeDate() {
 	locsg, _ := time.LoadLocation("Singapore")
 	log.Printf("ori: %s -> local Local()s: %s \n", some, some.Local())
 	log.Printf("ori: %s -> local In: %s \n", some, timefmt.Format(some.In(locsg), STD_TWITTER_UTC_STRING_PARSE))
+
+	timeStart := time.Date(2022, 10, 1, 0, 0, 0, 0, LOCSGTIME)
+	fmt.Println("[SampleTwitDate] CONVERT")
+
+	for timeStart.Month() == 10 {
+		fmt.Printf("[SampleTwitDate] %s\n", timeStart)
+		timeStart = timeStart.AddDate(0, 0, 1)
+	}
+
 }

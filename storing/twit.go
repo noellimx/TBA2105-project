@@ -16,7 +16,7 @@ type DBCN_Twitt struct {
 }
 
 func (dbcn *DBCN_Twitt) createTableTweet() {
-	query := `CREATE TABLE tweets (
+	query := `CREATE TABLE IF NOT EXISTS tweets (
 		"id_str" VARCHAR(50) NOT NULL PRIMARY KEY,
 		"yyyymmddhh" VARCHAR(` + fmt.Sprintf("%d", dateStrLength) + `) NOT NULL,
 		"yyyy" VARCHAR(4) NOT NULL,
@@ -162,7 +162,7 @@ func (dbcn *DBCN_Twitt) insertTweet(tweet *typings.TweetDB) {
 		return
 	}
 
-	query := `INSERT INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	query := `INSERT OR IGNORE INTO tweets VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		utils.VFatal(err.Error())
@@ -180,9 +180,15 @@ func NewDBCN_Twitt(dbFileName string, overwrite bool) *DBCN_Twitt {
 
 	if overwrite {
 		overwriteFilePath(dbFileName)
+	} else {
+		log.Println("[NewDBCN_Twitt] Will try access existing db.")
 	}
 
-	sqliteDatabase, _ := sql.Open(DbDriver, fmt.Sprintf("./%s", dbFileName))
+	sqliteDatabase, err := sql.Open(DbDriver, fmt.Sprintf("./%s", dbFileName))
+
+	if err != nil {
+		utils.VFatal(err.Error())
+	}
 
 	return &DBCN_Twitt{
 		db: sqliteDatabase,
@@ -191,7 +197,8 @@ func NewDBCN_Twitt(dbFileName string, overwrite bool) *DBCN_Twitt {
 func InitTwitDB(overwrite bool, dbName string) *DBCN_Twitt {
 	// SQLite is a file based database.
 
-	dbcn := NewDBCN_Twitt(dbName, true)
+	dbcn := NewDBCN_Twitt(dbName, overwrite)
+
 	dbcn.createTableTweet() // Create Database Tables
 
 	return dbcn
