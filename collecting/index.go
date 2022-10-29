@@ -87,19 +87,20 @@ func (ct *ClientTWit) twitterSearch1_1(query string, yyyymmdd_s string, yyyymmdd
 		postBodyMap["next"] = next
 	}
 	postBody, _ := json.Marshal(postBodyMap)
-	responseBody := bytes.NewBuffer(postBody)
+	requestBody := bytes.NewBuffer(postBody)
 
 	// 2. Form HTTPS Request
 	url := fmt.Sprintf("https://api.twitter.com/1.1/tweets/search/%s/%s.json", endpoint, env)
 
 	log.Println(url)
-	req, _ := http.NewRequest(httpMethods.post, url, responseBody)
+	req, _ := http.NewRequest(httpMethods.post, url, requestBody)
 
 	q := req.URL.Query()
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ct.globalConfig.Twitter.Bearer))
 	req.Header.Add("Content-Type", "application/json")
 
 	log.Printf("[cT.twitterSearch1_1] Query: \"%s\" \n", query)
+	log.Printf("[cT.twitterSearch1_1] requestBody: \"%s\" \n", requestBody)
 
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()

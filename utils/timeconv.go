@@ -5,14 +5,13 @@ import (
 	"time"
 )
 
-func GoTimeToYYYYMMDD(t *time.Time) (string, string, string, string, string) {
+func GoTimeToYYYYMMDDHH(t *time.Time) (yyyy string, mm string, dd string, hh string, dateStr string) {
 
-	yyyy := fmt.Sprintf("%04d", t.Year())
-	mm := fmt.Sprintf("%02d", int(t.Month()))
-	dd := fmt.Sprintf("%02d", t.Day())
-	hh := fmt.Sprintf("%02d", t.Hour())
+	yyyy_ := fmt.Sprintf("%04d", t.Year())
+	mm_ := fmt.Sprintf("%02d", int(t.Month()))
+	dd_ := fmt.Sprintf("%02d", t.Day())
+	hh_ := fmt.Sprintf("%02d", t.Hour())
 
-	dateStr := fmt.Sprintf("%s%s%s%s", yyyy, mm, dd, hh)
-
-	return yyyy, mm, dd, hh, dateStr
+	dateStr_ := fmt.Sprintf("%s%s%s%s", yyyy_, mm_, dd_, hh_)
+	return yyyy_, mm_, dd_, hh_, dateStr_
 }

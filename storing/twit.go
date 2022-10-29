@@ -71,7 +71,7 @@ func (dbcn *DBCN_Twitt) AddWordCount(yyyymmddhh string, lemma string, retweetOrF
 	}
 
 	countToAdd := 1 + retweetOrFavCount
-
+	log.Printf("[AddWordCount] %s Word: %s Count: %d", yyyymmddhh, lemma, countToAdd)
 	_, err = statement.Exec(countToAdd, yyyymmddhh, lemma)
 	if err != nil {
 		utils.VFatal(err.Error())
@@ -110,7 +110,7 @@ func (dbcn *DBCN_Twitt) GetTweetsInTheHour(yyyymmddhh string) *[]*PText {
 		var rtFC int
 		rows.Scan(&text, &rtFC)
 
-		log.Printf("%s Text: %s Count: %d\n", yyyymmddhh, text, rtFC)
+		log.Printf("[GetTweetsInTheHour] %s Text: %s Retweet or Favourite Count: %d\n", yyyymmddhh, text, rtFC)
 
 		ptext := &PText{
 			Text:              text,
@@ -130,6 +130,19 @@ func (dbcn *DBCN_Twitt) CreateTableWords() {
 	  );`
 
 	log.Println("Creating Words table...")
+	statement, err := dbcn.db.Prepare(query)
+	if err != nil {
+		utils.VFatal(err.Error())
+	}
+	statement.Exec()
+	statement.Close()
+	log.Println("Words table created if not exist")
+}
+
+func (dbcn *DBCN_Twitt) CleanTableWords() {
+	query := `DELETE FROM words;`
+
+	log.Println("Cleaning Words table...")
 	statement, err := dbcn.db.Prepare(query)
 	if err != nil {
 		utils.VFatal(err.Error())

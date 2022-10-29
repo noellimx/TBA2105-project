@@ -48,7 +48,7 @@ func ResulttoTweetDBAndTimeConversion(c *typings.ResponseResults) *typings.Tweet
 	c.CreatedAt = timefmt.Format(createdAtLocal_Time.In(LOCSGTIME), STD_TWITTER_UTC_STRING_PARSE)
 	log.Printf("[ResulttoTweetDB] Time: %s ID: %s \n", createdAtLocal_Time, c.IdStr)
 
-	yyyy, mm, dd, hh, dateStr := utils.GoTimeToYYYYMMDD(&createdAtLocal_Time)
+	yyyy, mm, dd, hh, dateStr := utils.GoTimeToYYYYMMDDHH(&createdAtLocal_Time)
 
 	text := c.Text
 

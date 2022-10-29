@@ -5,10 +5,11 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/noellimx/TBA2105-project/config"
 	"github.com/noellimx/TBA2105-project/storing"
-	"github.com/noellimx/TBA2105-project/typings"
+	"github.com/noellimx/TBA2105-project/utils"
 	"github.com/noellimx/TBA2105-project/wrangling"
 )
 
@@ -16,12 +17,15 @@ var CONFIG_PATH string = "./config.json"
 
 var globalConfig = config.ReadConfig(CONFIG_PATH)
 
-var YYYYMMDDFrom string = "20220101"
-var YYYYMMDDTo string = "20220731"
+var YYYYMMDDFrom string = "20210101"
+var YYYYMMDDTo string = "20211231"
 
 var query1 string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs point_radius:[103.7692886848949 1.4526057415829072 25mi]"
 var queryWithoutGeo string = "jb checkpoint OR jb causeway OR jb customs OR woodlands checkpoint OR woodlands causeway OR woodlands customs OR johor checkpoint OR johor causeway OR johor customs"
 
+var queryWithGeoNoSearchValShort = "point_radius:[103.7692886848949 1.4526057415829072 3mi]"
+
+var _ string = "point_radius:[103.7692886848949 1.4526057415829072 25mi]"
 var query string = queryWithoutGeo
 
 func processProject(fn string) {
@@ -30,13 +34,25 @@ func processProject(fn string) {
 
 	dbcn.CreateTableWords()
 
-	tt := typings.NewTTime(2022, 10, 1, 0)
+	dbcn.CleanTableWords()
 
-	hours := 24
-	days := 30
-	for i := 0; i < hours*days; i++ {
+	ttt := time.Date(2021, 1, 1, 0, 0, 0, 0, storing.LOCSGTIME)
 
-		yyyymmddhh := tt.AsString()
+	now := time.Now()
+
+	_, _, _, _, yyyyddmmhhnow := utils.GoTimeToYYYYMMDDHH(&now)
+
+	log.Printf("[processProject] %s now-> %s", now, yyyyddmmhhnow)
+
+	for {
+		_, _, _, _, yyyymmddhh := utils.GoTimeToYYYYMMDDHH(&ttt)
+
+		if yyyyddmmhhnow == yyyymmddhh {
+			log.Printf("[processProject] %s", yyyyddmmhhnow)
+			break
+		}
+		log.Printf("[processProject] Processing for: %s", yyyyddmmhhnow)
+
 		ptexts := dbcn.GetTweetsInTheHour(yyyymmddhh)
 
 		for _, ptext := range *ptexts {
@@ -46,7 +62,8 @@ func processProject(fn string) {
 
 			dbcn.AddWordCounts(yyyymmddhh, lemmas, ptext.RetweetOrFavCount)
 		}
-		tt.JumpHour()
+
+		ttt = ttt.Add(time.Hour)
 	}
 
 }
