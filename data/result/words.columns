@@ -1,0 +1,4 @@
+"name","type","length","leftDigits","rightDigits"
+"yyyymmddhh","INTEGER","10","10","0"
+"word","STRING","36","0","0"
+"count","INTEGER","5","5","0"
