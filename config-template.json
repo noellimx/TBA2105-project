@@ -1,7 +1,7 @@
 {
-    "twitter": {
-        "client_key":     "",
-        "client_secret": "",
-        "bearer": ""
-    }
+  "twitter": {
+    "client_key": "",
+    "client_secret": "",
+    "bearer": ""
+  }
 }
